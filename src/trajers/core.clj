@@ -15,11 +15,31 @@
 (def epsilon [0 1])
 (def epsilon-weight 1)
 
+(def norm-mean 0)
+(def norm-std 1)
+(def inform-frac 0.3)
+
+;; Utilities
+(defn round2
+  "Round a double to the given precision (number of significant digits)"
+  [precision d]
+  (let [factor (Math/pow 10 precision)]
+    (/ (Math/round (* d factor)) factor)))
+(defn uuid
+  []
+  (keyword (str (java.util.UUID/randomUUID))))
+
 ;; Draw functions
 (defn draw-incant-norm
-  [m sd]
-  (stats/sample-normal 1 :mean m :sd sd)
-  )
+  ([]
+   (stats/sample-normal 1 :mean norm-mean :sd norm-std))
+  ([n]
+   (stats/sample-normal n :mean norm-mean :sd norm-std))
+  ([m sd]
+   (stats/sample-normal 1 :mean m :sd sd)))
+(defn draw-round
+  []
+  (round2 2 (draw-incant-norm)))
 (defn draw
   [v]
   (apply draw-incant-norm v)
@@ -28,6 +48,95 @@
   []
   (+ (* theta-weight (draw theta) (* epsilon-weight (draw epsilon))))
   )
+
+;; Agent functions
+(defn make-agent
+  ([sp]
+   {:prior (draw-round) :informed? false :sp sp
+    :id (uuid)})
+  ([sp prior]
+   {:prior prior :informed? true :sp sp
+    :id (uuid)})
+  )
+(defn agent-learn
+  [a p]
+  (let [{prior :prior
+         sp :sp} a 
+        abs-val (fn [p]
+                  (Math/abs (- prior p)))
+        old-diff (abs-val sp) 
+        new-diff (abs-val p)
+        np-a (assoc a :sp p)]
+    (cond
+      (:informed? a) np-a
+      (< new-diff old-diff) np-a
+      :else (assoc np-a :prior (/ (+ prior p) 2)))))
+
+;; Market functions
+(defn make-agent-list
+  [inf-prior start-price]
+  (into []
+        (concat (take (* agent-num inform-frac)
+                      (repeatedly (partial make-agent start-price inf-prior)))
+                (take (* (- 1 inform-frac) agent-num)
+                      (repeatedly (partial make-agent start-price)))))
+  )
+(defn make-market
+  []
+  (let [security (draw-round)
+        start-price (draw-round)]
+    {:security security
+     :price start-price
+     :agents (make-agent-list security start-price)}
+    ))
+(defn- update-price
+  [m pe]
+  (+ (* pe 0.01) (:price m))
+  )
+
+;; TODO e appears to be broken, I have agents who should be selling but e says they are all buying. 
+;; This leads to an endless drive up (or down, if we end up with everyone selling) Have to investigate.
+(defn- take-orders
+  [al p]
+  (let [take-order (fn [a]
+                     (let [{prior :prior id :id} a]
+                       (cond
+                         (> prior p) {id :sl}
+                         (< prior p) {id :bl}
+                         :else nil)))
+        orders (filter #(not (nil? %)) (mapv #(take-order %) al))
+        [sl bl e] (let [[sl bl] (mapv #(set (keys (into {} %)))
+                               ((juxt filter remove) #(= :sl (val (first %))) orders))
+                        blcount (count bl)
+                        slcount (count sl)
+                        e (- blcount slcount)]
+                    (conj (cond
+                             (> slcount blcount) [(set (take blcount sl)) bl]
+                             (> blcount slcount) [sl (set (take slcount bl))]
+                             :else [sl bl])
+                          e))
+        
+        add-stock (fn [a s]
+                    (cond
+                      (vector? (:holdings a)) (assoc a :holdings (conj (:holdings a) s))
+                      :else (assoc a :holdings [s])))
+         ]
+    [(mapv (fn [a] (cond
+                      (contains? sl (:id a)) (add-stock a p)
+                      (contains? bl (:id a)) (add-stock a (- p))
+                      :else a)) al) e]
+    )
+  )
+
+(defn market-update
+  [m]
+  (let [[new-agents pe] (take-orders (map #(agent-learn % (:price m)) (:agents m)) (:price m))]
+    (-> m
+        (assoc :agents new-agents)
+        (assoc :price (update-price m pe))
+        ))
+  )
+
 (def init-mkt (rand))
 (def model {:mkt init-mkt :al agent-list :pl []}) 
 
