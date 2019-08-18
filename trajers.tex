@@ -1,4 +1,4 @@
-% Created 2019-07-25 Thu 10:40
+% Created 2019-07-31 Wed 11:37
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -14,6 +14,8 @@
 \usepackage{amssymb}
 \usepackage{capt-of}
 \usepackage{hyperref}
+\usepackage[citestyle=authoryear,bibstyle=authoryear,hyperref=true,backref=true,maxcitenames=3,url=true,backend=biber,natbib=true] {biblatex}
+\addbibresource{/home/matt/Dropbox/BibLaTeX/library.bib}
 \author{Matt}
 \date{\today}
 \title{}
@@ -32,12 +34,16 @@
 agent-num
 \end{verbatim}
 \section{Need code to do the following:}
-\label{sec:orgbf8bb7e}
+\label{sec:org4cd107a}
 \begin{enumerate}
 \item Security with single price vector.
 \item Informed and uninformed agents: informed agents receive signal, uninformed guess from distribution.
 \item Pricing mechanism: draw random price from normal distribution and take orders.
 \item Price updating: based on buy/sell vectors of a single unit.
-\item Agent updating: do not trade if price moves the "wrong" way. Instead, update guess.
+\item Agent updating: do not trade if price moves the "wrong" way. Instead, update
+guess.
 \end{enumerate}
+
+
+\printbibliography
 \end{document}
