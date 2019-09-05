@@ -48,64 +48,74 @@
   )
 
 ;; Agent functions
-(defn make-agent
-  ([sp]
-   {:prior (draw-round) :informed? false :sp sp
-    :id (uuid)})
-  ([sp prior]
-   {:prior prior :informed? true :sp sp
-    :id (uuid)})
+(defn prior-vals
+  [a]
+  (mapv :value (:prior a)))
+(defn move-away?
+  [old-price new-price prior]
+  (let [abs-val (fn [p] (Math/abs (- prior p)))]
+    (> (abs-val new-price) (abs-val old-price)))
   )
-(defn agent-learn
-  [a p]
-  (let [{prior :prior
-         sp :sp} a 
-        abs-val (fn [p]
-                  (Math/abs (- prior p)))
-        old-diff (abs-val sp) 
-        new-diff (abs-val p)
-        np-a (assoc a :sp p)]
+;; TODO This isn't actually what I want! I don't want them to move that one prior closer to price, I want them to move that prior closer to price MINUS the rest of the vector. So this is a bit more complicated. Probably explains weirdness I am getting in graphs.
+(defn avg-update
+  [p prior]
+  (/ (+ (:value prior) p) 2))
+(defn rand-uninf
+  [v]
+  (let [r (rand-int (count v))]
     (cond
-      (:informed? a) np-a
-      (< new-diff old-diff) np-a
-      :else (assoc np-a :prior (/ (+ prior p) 2)))))
-
+      (and (= (count v) 1) (:informed? (get v r))) nil
+      (:informed? (get v r)) (recur v)
+      :else r)
+    )
+  )
+(defn prior-update
+  [pri pred upd]
+  (let [i (rand-uninf pri)
+        sel-pri (get pri i)]
+    (cond
+      (and sel-pri pred) (update pri i #(assoc % :value (upd sel-pri)))
+      :else pri 
+      )))
+(defn make-agent
+  ([n]
+   {:prior (vec (repeatedly n (fn [] {:informed? false :value (draw-round)}))) 
+    :id (uuid)})
+  ([n prior]
+   (let [valv (vec (repeatedly n (fn [] {:informed? false :value (draw-round)})))
+         i (rand-int n)]
+     {:prior (assoc valv i {:informed? true :value (get prior i)}) 
+      :id (uuid)}))
+  )
 ;; Market functions
 (defn make-agent-list
-  [inf-prior start-price]
+  [n inf-prior]
   (into []
-        (concat (take (* agent-num inform-frac)
-                      (repeatedly (partial make-agent start-price inf-prior)))
-                (take (* (- 1 inform-frac) agent-num)
-                      (repeatedly (partial make-agent start-price)))))
+        (concat (repeatedly (* agent-num inform-frac) (partial make-agent n inf-prior))
+                (repeatedly (* (- 1 inform-frac) agent-num) (partial make-agent n))))
   )
 (defn make-market
-  []
-  (let [security (draw-round)
+  [n]
+  (let [security (vec (repeatedly n draw-round))
         start-price (draw-round)]
     {:security security
      :price start-price
-     :agents (make-agent-list security start-price)}
+     :sp start-price
+     :agents (make-agent-list n security)}
     ))
 (defn- update-price
-  [m pe]
-  (+ (:price m) (cond
+  [p pe]
+  (+ p (cond
                   (> pe 0) 0.01
                   (< pe 0) -0.01
                   :else 0))
   ;(+ (* pe 0.01) (:price m))
   )
-(defn take-order
-  [a p]
-  (let [{prior :prior id :id} a]
-    (cond
-      (> p prior) {id :sl}
-      (< p prior) {id :bl}
-      :else nil)))
 (defn- take-orders
   [al p]
   (let [take-order (fn [a]
-                     (let [{prior :prior id :id} a]
+                     (let [prior (reduce + (prior-vals a))
+                           id (:id a)]
                        (cond
                          (> p prior) {id :sl}
                          (< p prior) {id :bl}
@@ -121,7 +131,6 @@
                              (> blcount slcount) [sl (set (take slcount bl))]
                              :else [sl bl])
                           e))
-        
         add-stock (fn [a s]
                     (cond
                       (vector? (:holdings a)) (assoc a :holdings (conj (:holdings a) s))
@@ -136,26 +145,49 @@
 
 (defn market-update
   [m]
-  (let [[new-agents pe] (take-orders (map #(agent-learn % (:price m)) (:agents m)) (:price m))]
+  (let [price (:price m)
+        sp (:sp m)
+        up-agents (mapv (fn [a] (let [prior (:prior a)]
+                                  (-> a
+                                      (assoc :prior
+                                             (prior-update
+                                              prior
+                                              (move-away? sp price (reduce + (prior-vals a)))
+                                              (partial avg-update price)))))) (:agents m))
+        [new-agents pe] (take-orders up-agents price)]
     (-> m
+        (assoc :sp price)
         (assoc :agents new-agents)
-        (assoc :price (update-price m pe))
+        (assoc :price (update-price price pe))
         ))
   )
 
 ;; Oz
 (defn make-data
   [ms]
-  (vec (mapcat #(let [priors (mapv :prior (:agents %2))
-                      infs (mapv :informed? (:agents %2))]
+  (vec (mapcat #(let [priors (mapv (fn [a] (:value (first (:prior a)))) (:agents %2))
+                      infs (mapv (fn [a] (:informed? (first (:prior a)))) (:agents %2))]
                   (mapv (fn [prior inf] (hash-map :time %1
                                                   :price (:price %2)
                                                   :prior prior
                                                   :informed? inf)) priors infs))
                (range (count ms)) ms))
   )
-(def m (make-market))
-(def mt (make-data (take 100 (iterate market-update m))))
+(defn make-snap-data
+  [ms]
+  (vec (mapcat #(let [priors (mapv (fn [a] (prior-vals a)) (:agents %2))
+                      infs (mapv (fn [a] (mapv :informed? (:prior a))) (:agents %2))]
+                  (mapv (fn [prior inf] (hash-map :time %1
+                                                  :price1 (first (:security %2)) 
+                                                  :price2 (second (:security %2)) 
+                                                  :prior1 (first prior)
+                                                  :prior2 (second prior)
+                                                  :informed? (if (first inf) 1 2)
+                                                  )) priors infs))
+               (range (count ms)) ms)))
+(def m (make-market 2))
+(def mt (make-data (take 1000 (iterate market-update m))))
+(def snap (make-snap-data (take 2000 (iterate market-update m))))
 (def price-plot
   {:height 600
    :width 800
@@ -168,8 +200,34 @@
                        :y {:field "price"}}
             :mark {:type "line"}}]
    })
-(oz/start-server!)
-(oz/view! price-plot)
+(def mst (filter #(= (:time %) 1999) snap))
+(def price-snap-plot
+  {:height 600
+   :width 800
+   :data {:values mst}
+   :layer [{:encoding {:x {:field "prior1"}
+                       :y {:field "prior2"}
+                       :color {:field "informed?"}}
+            :mark {:type "point" :opacity 0.3}}
+           {:encoding {:x {:field "price1"}
+                       :y {:field "price2"}}
+            :mark {:type "point" :shape "square" :size 60}}]
+   })
+(oz/view! price-snap-plot)
+(defn plot-snap
+  [d n]
+  (oz/view! {:height 600
+   :width 800
+   :data {:values (filter #(= (:time %) n) d)}
+   :layer [{:encoding {:x {:field "prior1"}
+                       :y {:field "prior2"}
+                       :color {:field "informed?"}}
+            :mark {:type "point" :opacity 0.3}}
+           {:encoding {:x {:field "price1"}
+                       :y {:field "price2"}}
+            :mark {:type "point" :shape "square" :size 60}}]
+   }))
+;(oz/start-server!)
 
 (defn -main
   "I don't do a whole lot ... yet."
