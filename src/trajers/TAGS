@@ -1,0 +1,37 @@
+
+/home/matt/Dropbox/clojure/trajers/src/trajers/core.clj,1379
+(def agent-num 200)agent-num11,207
+(def agent-list (take agent-num (repeatedly rand)))agent-list12,227
+(def theta [0 1])theta13,279
+(def theta-weight 1)theta-weight14,297
+(def epsilon [0 1])epsilon15,318
+(def epsilon-weight 1)epsilon-weight16,338
+(def norm-mean 0)norm-mean18,362
+(def norm-std 1)norm-std19,380
+(def inform-frac 0.3)inform-frac20,397
+(defn round2round223,433
+(defn uuiduuid28,618
+(defn draw-incant-normdraw-incant-norm33,700
+(defn draw-rounddraw-round40,904
+(defn drawdraw43,959
+(defn draw-udraw-u47,1009
+(defn make-agentmake-agent53,1121
+(defn agent-learnagent-learn61,1286
+(defn make-agent-listmake-agent-list76,1653
+(defn make-marketmake-market84,1968
+(defn- update-priceupdate-price92,2163
+(defn- take-orderstake-orders99,2431
+(defn market-updatemarket-update131,3727
+(def init-mkt (rand))init-mkt140,3953
+(def model {:mkt init-mkt :al agent-list :pl []}) model141,3975
+(defn update-agent-prices update-agent-prices152,4180
+(defn update-agentsupdate-agents156,4262
+(defn tradetrade160,4339
+(defn update-mktupdate-mkt165,4374
+(defn ticktick169,4472
+(defn play-data [& names]play-data177,4651
+(def line-plotline-plot181,4805
+(def stacked-barstacked-bar197,5144
+(def contour-plot (oz/load "resources/contour-lines.vega.json"))contour-plot207,5510
+(def vizviz208,5575
+(defn -main-main221,5999
