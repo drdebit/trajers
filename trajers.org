@@ -32,7 +32,7 @@
 \begin{titlepage}
 \singlespacing
 \begin{center}
-\LARGE Sympathy for the Noise Trader: Limitations of Learning from Price
+\LARGE Sympathy for the Noise Trader: Limitations to Learning from Price
 \vspace*{35mm}
 
 \normalsize Matthew D. DeAngelis\textsuperscript{a}
@@ -50,7 +50,7 @@ I gratefully acknowledge the contributions of Kris Allee, John Campbell, Vic Lee
 #+LATEX: \newpage
 
 #+BEGIN_CENTER
-\LARGE Sympathy for the Noise Trader: Limitations of Learning from Price
+\LARGE Sympathy for the Noise Trader: Limitations to Learning from Price
 #+END_CENTER
 \vspace*{40mm}
 #+BEGIN_abstract
@@ -90,6 +90,7 @@ RQ: We often talk about "learning from price" in what I think is a sloppy way (h
 *** I'm not sure this is true; if my theory is correct regarding bundling, then the signal just gets obscured. So it could be more positive, more negative, or neither. On the other hand, maybe this is right; because the positive offsets the negative, everyone adjusts by less. Kind of depends on the magnitude of the adjustment that an investor "defaults" to...
 ** From cite:leeActiveFundsBundled2019: A second reason to study AMF reaction to earnings news stems from the broader issue of market efficiency. The issue of whether institutional investors help correct market mispricing has been widely debated. Some evidence suggests that institutional investors fail to take advantage of various pricing anomalies, and in some cases may even exacerbate them (Lewellen 2011; Edelen et al. 2016). Other studies find that higher institutional trading or ownership, and greater institutional attention to news, can improve price discovery. For example, Henry and Koski (2017) find that institutions earn higher profits around ex-dividend event days. Cheng, Hameed, Subrahmanyam, and Titman (2017) find that the magnitudes of short-term return reversals are higher following declines in the number of active institutional investors. Similarly, Bartov, Radhakrishnan, and Krinsky (2000) report that the level of institutional ownership is negatively correlated with the size of the post-earnings announcement drift (PEAD). Stocks with increases in mutual fund holdings have higher subsequent EA returns (Baker et al. 2010). In addition, greater institutional attention, as measured by Bloomberg terminal searches and the number of news reads, has also been associated with improved price discovery (Ben-Rephael, Da, and Israelsen 2017). However, none of these studies investigate the role of AMF trading in response to earnings news. We contribute to this literature by using detailed trade-level data to evaluate the role of AMFs in the price discovery process associated with earnings news. Specifically, we examine three related hypotheses. First, if AMF participation improves overall price discovery, then, ceteris paribus, we expect the EAs with greater abnormal AMF participation to exhibit faster and more complete price adjustments than EAs with little or no abnormal AMF participation. Specifically, we hypothesize that increased AMF trading during EAs leads to faster price convergence and reduced post-EA price drift. Second, we hypothesize that the directional (buy minus sell) trades of AMFs will generally ameliorate price drifts – that is, we expect net directional trading by AMFs shift returns from the post-EA period to the EA period. Finally, we conduct a detailed comparison of EA vs non-EA trades, controlling for the specific AMF in question. To the extent that AMFs have an informational advantage in processing the value implications of earnings news, we expect their EA period trades to be more profitable than their non-EA trades.
 ** From cite:diamondInformationAggregationNoisy1981, on how their two parameter model differs from mine: Noise is critical to the analysis of the model’s equilibrium, so some comment is in order on the mechanism by which it is introduced. The assumed stochastic supply of endowments, originally used by Green (1973) and Grossman-Stiglitz (1980), may appear to be somewhat artificial. Perhaps this is why the information contained in an individual’s endowment about has been neglected in the past. The noise represents factors other than information which cause prices to vary, and are imperfectly observed. Although not strictly special cases of stochastic endowments, there are several other examples of noise, such as individually stochastic life cycle motives for trade, and individually stochastic taxes. A simple example of the latter is the change in the capital gains tax faced by an individual due to the step-up in cost basis when a trader dies and leaves his assets to the next generation. It may be worth investigating whether introducing noise explicitly through such plausible factors will provide any additional insights.
+** [#A] cite:hongDisagreementStockMarket2007a have a model that is somewhat similar where they allow investors to observe only one of two signals and trade with one another. 
 
 \doublespacing
 * Introduction
