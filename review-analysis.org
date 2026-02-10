@@ -118,9 +118,9 @@ Making agents more sophisticated (e.g., Bayesian with correct priors, or using r
 The multi-signal nature of learning from price is also well-known in the muddling literature in rational expectations and can be shown theoretically without need for a full-on simulation. If there is a single signal to learn from but an n-dimensional original information set, the signal will not fully reveal the entire information set. This is certainly true in GS where the fundamental information is perturbed by noise traders; or Fischer and Verrecchia (2000) with an incentive shock perturbing the learning; or in multi-signal LENs where the effort is perturbed by noise (Feltham and Xie 1994). These mechanisms breaking how we can invert private information from a single signal are now well-known.
 #+END_QUOTE
 
-** Assessment: The Weakest Critique
+** Assessment: Partially Fair in Principle, but the Cited Papers Do Not Preempt the Contribution
 
-This is the referee's most important claim, and it is not supported by the cited papers. We examine each in detail.
+The referee's core intuition --- that a single signal cannot fully reveal an $n$-dimensional information set --- is correct as a general principle, and the theoretical literature (Radner 1979, Jordan 1982) does establish the dimensional constraint. However, the /specific papers the referee cites/ do not address the same structural problem, and the paper's contribution is not preempted by them. We examine each in detail.
 
 *** Fischer & Verrecchia (2000): "Reporting Bias"
 
@@ -230,7 +230,7 @@ This distinction is not made in any of the papers the referee cites.
 |-----------|-------|--------|
 | 1. Model incomprehensible | Partially | Presentation needs formal math, but "not anywhere close to GS" is overstated |
 | 2. Convergence known (Gode & Sunder) | No | Gode & Sunder studies a different question entirely; incomplete learning is structural, not from agent suboptimality |
-| 3. Multi-signal learning known | No | Cited papers all have 1:1 parameter-to-signal ratios; they address noisy identification, not structural non-identification |
+| 3. Multi-signal learning known | Partially | The general principle is established (Radner/Jordan), but the referee's specific citations (GS, Fischer & Verrecchia, Feltham & Xie) all have 1:1 parameter-to-signal ratios and address noisy identification, not structural non-identification. The paper's specific contribution --- applying this to single-security investor learning and measuring scaling with $n$ --- is not preempted. |
 
 The paper's core contribution --- that aggregate price efficiency does not imply individual parameter efficiency, and that this is a /structural/ limitation rather than a noise problem --- is not preempted by the cited literature. The primary weakness is presentation: the paper needs formal mathematics, explicit statement of departures from GS, and a clear framing of the identification problem as distinct from the noise problems studied in the existing literature.
 
@@ -244,7 +244,7 @@ Three foundational papers in general equilibrium theory establish the dimensiona
 
 - *Radner (1979)*: "Rational Expectations Equilibrium: Generic Existence and the Information Revealed by Prices." /Econometrica/. Establishes that fully-revealing REE requires dim(price space) $\geq$ dim(state space). When this condition holds with finite states, full revelation is generic.
 
-- *Allen (1981)*: "Strict Rational Expectations Equilibria with Diffuseness." /Journal of Economic Theory/. Explicitly states the necessary condition that the price space must have at least as high a dimension as the state space for generic full revelation.
+- *Allen (1982)*: "Strict Rational Expectations Equilibria with Diffuseness." /Journal of Economic Theory/. Explicitly states the necessary condition that the price space must have at least as high a dimension as the state space for generic full revelation.
 
 - *Jordan (1982)*: "The Generic Existence of Rational Expectations Equilibrium in the Higher Dimensional Case." /Journal of Economic Theory/. Proves the converse: when dim(states) > dim(prices), fully revealing REE /generically do not exist/. This is the sharpest impossibility result and the direct theoretical precedent.
 
@@ -282,7 +282,7 @@ A second tier of papers builds models where a single price aggregates multiple u
 | Avery & Zemsky (1998) | 2--3 dimensions of uncertainty | 1 (asset price) | Herding behavior |
 | Sockin & Xiong (2015) | Supply + demand shock | 1 (commodity price) | Feedback amplification |
 | Goldstein & Yang (2015) | 2 fundamentals | 1 (stock price) | Information complementarities |
-| Goldstein & Yang (2019) | 2 dimensions of uncertainty | 1 (stock price) | Disclosure crowding-out |
+| Goldstein & Yang (2019) | 2 dimensions of uncertainty | 1 (stock price) | Disclosure crowds out /or/ crowds in information acquisition depending on disclosure type |
 | Benhabib, Wang & Wen (2015) | Fundamental + sentiment | 1 (aggregate price) | Self-fulfilling equilibria |
 | Rondina & Walker (2021) | Multiple shocks | Endogenous signals | Confounding dynamics |
 | Adams (2024, WP) | Aggregate signals | Endogenous | States asset prices "necessarily fail" invertibility |
@@ -310,7 +310,9 @@ Adams studies macroeconomic models where agents observe /endogenous/ signals ---
 
 The critical insight: *"Models where the endogenous signals are aggregates --- such as asset prices in the confounding dynamics example --- will necessarily fail this condition"* (p.22). When a signal is a pure aggregate (like a stock price), the projection matrix $P_G$ identifies only aggregate shocks. The matrix $I - P_G$ isolates idiosyncratic dimensions --- but aggregation /zeroes these out/. Therefore $\Sigma_I$ is singular, SIC fails, and uniqueness cannot be guaranteed. In his confounding dynamics example, SIC failure leads to multiple equilibria: both a full-information equilibrium and a "confounding dynamics" equilibrium coexist.
 
-Relevance to this paper: Adams provides the formal, general characterization of precisely the problem this paper's simulation demonstrates. The stock price of a single security is a pure aggregate signal: $V = \sum \theta_i$ becomes a single number that zeroes out all idiosyncratic component information. Adams shows this implies the invertibility condition necessarily fails; this paper's simulation demonstrates what that failure looks like in practice --- aggregate convergence coexisting with component-level non-identification, with MSE scaling with $n$.
+*Important distinction*: Adams's framework concerns the /macroeconomic/ setting --- whether a system of aggregate signals across an economy can identify the underlying state --- not the single-security investor learning problem studied in the paper under review. In Adams's models, the signals are aggregate variables (like asset prices or output) observed across the economy, and the question is whether the system of signals can identify macroeconomic states. The paper under review concerns a different setting: a single security with $n$ valuation parameters and one price.
+
+However, the underlying mathematical mechanism is the same: when a signal is a pure aggregate, it cannot be inverted to recover the individual components that produced it. Adams shows that the stock price of a single security is a pure aggregate signal: $V = \sum \theta_i$ becomes a single number that zeroes out all idiosyncratic component information. This implies the invertibility condition necessarily fails. The paper's simulation demonstrates what that failure looks like in practice --- aggregate convergence coexisting with component-level non-identification, with MSE scaling with $n$.
 
 **** Banerjee, Davis & Gondhi (2018): "When Transparency Improves, Must Prices Reflect Fundamentals Better?"
 
@@ -332,7 +334,7 @@ Several streams in the accounting literature document empirical phenomena consis
 
 *** Information bundling literature
 
-- *Dye & Sridhar (2015)*: "Promoting Informativeness via Staggered Information Releases." /Review of Accounting Studies/. Formally shows that a firm releasing multiple pieces of information simultaneously cannot learn from the market's reaction which piece the market is responding to. Staggered release allows each piece to be separately priced. /This paper directly establishes that aggregate simultaneous pricing prevents learning about individual information components./ It is perhaps the most directly supportive paper in the accounting literature.
+- *Ramanan (2015)*: "Promoting Informativeness via Staggered Information Releases." /Review of Accounting Studies/, 20, 537--558. DOI: 10.1007/s11142-014-9307-6. Formally shows that a firm releasing multiple pieces of information simultaneously cannot learn from the market's reaction which piece the market is responding to. Staggered release allows each piece to be separately priced. /This paper directly establishes that aggregate simultaneous pricing prevents learning about individual information components./ It is perhaps the most directly supportive paper in the accounting literature. (Note: previously misattributed to Dye & Sridhar, who are acknowledged for comments.)
 
 - *Ahci, Martens & Sextroh (2022)*: "Information Bundling and Capital Market Feedback." Uses patent grant dates to show that bundling information impedes managerial learning from market feedback. When multiple signals are released simultaneously, the aggregate price response cannot be decomposed into individual component signals.
 
@@ -364,7 +366,7 @@ Several streams in the accounting literature document empirical phenomena consis
 
 *** Experimental evidence
 
-- A 2025 paper in /Journal of Behavioral and Experimental Finance/ ("The Effects of Public Disclosures and Information Acquisition on Price Informativeness in a Multi-Attribute Asset Market") directly tests and confirms that learning individual components from aggregate prices requires strategic disclosure management --- the aggregate price alone does not spontaneously reveal individual attributes.
+- *Davis, Korenok & Lightle (2025)*: "The Effects of Public Disclosures and Information Acquisition on Price Informativeness in a Multi-Attribute Asset Market." /Journal of Behavioral and Experimental Finance/, 47, 101084. DOI: 10.1016/j.jbef.2025.101084. A laboratory experiment with a two-component asset of uncertain value. The paper directly tests and confirms that learning individual components from aggregate prices requires strategic disclosure management --- the aggregate price alone does not spontaneously reveal individual attributes.
 
 ** Agent-Based / Computational Literature: A Notable Gap
 
@@ -374,8 +376,7 @@ The entire agent-based simulation literature on information aggregation uses *si
 |-------|-------------|---------------------|
 | Gode & Sunder (1993) | Single private value | No |
 | Jamal, Maier & Sunder (2024) | Single unknown state | No |
-| Gatti, Ferraro & Licalzi (2024) | Single unknown state | No |
-| Lopez-Lira (2025) | Single asset value | No |
+| Lopez-Lira (2025) | Single asset value (LLM agents) | No |
 | Corgnet et al. (2020) | Single unknown state | No |
 | Axtell & Farmer (2025, survey) | Various, all 1-D | No |
 | LeBaron (2006, survey) | Various, all 1-D | No |
@@ -396,7 +397,7 @@ This /confirms/ that the theoretical literature recognizes the dimensional const
 
 *** The abstract mathematical principle is established --- in a different context (cite and acknowledge)
 
-Jordan (1982) / Allen (1981) / Radner (1979) establish the dimensional impossibility in abstract multi-commodity general equilibrium. The paper must cite these and position its contribution relative to them. However, the relationship requires careful articulation:
+Jordan (1982) / Allen (1982) / Radner (1979) establish the dimensional impossibility in abstract multi-commodity general equilibrium. The paper must cite these and position its contribution relative to them. However, the relationship requires careful articulation:
 
 - Radner and Jordan prove that /equilibrium price functions/ in multi-commodity economies cannot generically be fully revealing when dim(states) > dim(prices). Their "prices" are commodity price vectors, not single stock prices. Their results concern /existence of equilibria/, not /investor learning dynamics/.
 - The paper under review shows that /for any single security with multiple underlying parameters/, the condition is trivially and always violated --- one price, $n > 1$ unknowns. This is not a special case of Radner/Jordan (which concerns multi-commodity economies) but rather a parallel application of the same mathematical principle (injectivity requires sufficient dimensionality) to a fundamentally different setting (single-security investor learning).
@@ -417,15 +418,15 @@ No paper found:
 
 The paper should:
 
-1. Cite Jordan (1982), Allen (1981), and Radner (1979), carefully distinguishing what they show (existence/non-existence of fully-revealing equilibria in multi-commodity economies) from what the paper shows (investor learning dynamics for a single security with multiple parameters). Emphasize that the Radner/Jordan condition is trivially violated for any single security with $n > 1$ parameters, yet neither the theoretical nor empirical literature has drawn this implication.
+1. Cite Jordan (1982), Allen (1982), and Radner (1979), carefully distinguishing what they show (existence/non-existence of fully-revealing equilibria in multi-commodity economies) from what the paper shows (investor learning dynamics for a single security with multiple parameters). Emphasize that the Radner/Jordan condition is trivially violated for any single security with $n > 1$ parameters, yet neither the theoretical nor empirical literature has drawn this implication.
 
 2. Cite Goldstein & Yang (2015) as the closest finance theory paper, noting that their model uses $n = 2$ fundamentals and one price but focuses on information complementarities, not on measuring component-level learning failure or connecting to accounting assumptions.
 
 3. Cite Sockin & Xiong (2015) and Avery & Zemsky (1998) as applied examples that exploit the confounding structure for different purposes (commodity feedback and herding, respectively).
 
-4. Cite Adams (2023) for the explicit statement that aggregate signals fail the invertibility condition.
+4. Cite Adams (2024) for the explicit statement that aggregate signals fail the invertibility condition. Note that Adams's framework concerns the macroeconomic setting (whether a system of aggregate signals across an economy can identify the underlying state) rather than the single-security problem, but the underlying mathematical mechanism is the same.
 
-5. Cite Dye & Sridhar (2015) and the accrual anomaly literature (Sloan 1996) as accounting evidence that is /consistent with/ the structural explanation but has not been connected to it.
+5. Cite Ramanan (2015) and the accrual anomaly literature (Sloan 1996) as accounting evidence that is /consistent with/ the structural explanation but has not been connected to it.
 
 6. Position the simulation as filling a gap: the entire ABM literature uses single-dimensional fundamentals, and no prior study demonstrates the coexistence of aggregate convergence with component-level non-identification.
 
@@ -445,18 +446,18 @@ The paper should:
 **** Must cite (directly relevant to positioning)
 
 - *Jordan (1982)*: "The Generic Existence of Rational Expectations Equilibrium in the Higher Dimensional Case." /Journal of Economic Theory/. The sharpest impossibility result: when dim(states) > dim(prices), fully revealing REE generically do not exist.
-- *Allen (1981)*: "Strict Rational Expectations Equilibria with Diffuseness." /Journal of Economic Theory/. States the dimensional necessary condition.
+- *Allen (1982)*: "Strict Rational Expectations Equilibria with Diffuseness." /Journal of Economic Theory/. States the dimensional necessary condition.
 - *Radner (1979)*: "Rational Expectations Equilibrium: Generic Existence." /Econometrica/. Establishes that dim(prices) $\geq$ dim(states) is needed for generic full revelation.
 - *Goldstein & Yang (2015)*: "Information Diversity and Complementarities in Trading and Information Acquisition." /Journal of Finance/. Closest finance theory paper: 2 fundamentals, 1 price.
 - *Sockin & Xiong (2015)*: "Informational Frictions and Commodity Markets." /Journal of Finance/. Clean 2-unknowns-from-1-price applied model.
 - *Adams (2024)*: "Macroeconomic Models with Incomplete Information and Endogenous Signals." Working paper (University of Florida). Introduces Information Feedback Regularity and Sufficient Idiosyncrasy Condition; proves aggregate signals (like asset prices) necessarily fail invertibility.
-- *Dye & Sridhar (2015)*: "Promoting Informativeness via Staggered Information Releases." /Review of Accounting Studies/. Formally shows bundled signals prevent component-level learning.
+- *Ramanan (2015)*: "Promoting Informativeness via Staggered Information Releases." /Review of Accounting Studies/, 20, 537--558. Formally shows bundled signals prevent component-level learning.
 
 - *Gelsomin & Hutton (2023)*: "The Learning Hypothesis Revisited." /Journal of Accounting and Economics/, 76, 101644. Explicitly questions whether managers can extract individual information from aggregate stock prices; ice cube metaphor perfectly illustrates the identification problem; identifies the unvalidated assumption that this paper shows is structurally unjustified.
 
 **** Should cite (strongly supportive or closely related)
 
-- *Goldstein & Yang (2019)*: "Good Disclosure, Bad Disclosure." /Journal of Financial Economics/. Disclosure about one dimension crowds out price informativeness about another.
+- *Goldstein & Yang (2019)*: "Good Disclosure, Bad Disclosure." /Journal of Financial Economics/. Disclosure about one dimension can crowd out /or/ crowd in information acquisition about another, depending on the type of information disclosed.
 - *Sloan (1996)*: "Do Stock Prices Fully Reflect Information in Accruals and Cash Flows?" /The Accounting Review/. Empirical evidence consistent with the structural explanation.
 - *Benhabib, Wang & Wen (2015)*: "Sentiments and Aggregate Demand Fluctuations." /Econometrica/. Price conflates fundamental and sentiment; signal extraction cannot separate them.
 - *Rondina & Walker (2021)*: "Confounding Dynamics." /Journal of Economic Theory/. Dynamic version of the confounding problem.
