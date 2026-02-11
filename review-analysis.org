@@ -364,6 +364,12 @@ Several streams in the accounting literature document empirical phenomena consis
 
 - *Armstrong, Heinle & Luneva (2024)*: "Financial Information and Diverging Beliefs." /Review of Accounting Studies/. When investors are uncertain about the precision of earnings as a signal, the same announcement can cause beliefs to /diverge/ rather than converge.
 
+*** Investor reliance on price over accounting fundamentals
+
+- *Blankespoor, deHaan, Wertz & Zhu (2019)*: "Why Do Individual Investors Disregard Accounting Information? The Roles of Information Awareness and Acquisition Costs." /Journal of Accounting Research/, 57(1), 53--84. DOI: 10.1111/1475-679X.12248. Exploits the introduction of AP automated ("robo-journalism") earnings articles, which present both earnings news and trailing stock returns side by side in the same article. Despite having earnings information delivered directly to them, individual investors /ignore the earnings content/ and trade based on trailing stock returns. The authors rule out awareness costs (investors clearly see the article) and acquisition costs (the data is right there), attributing the behavior to *integration costs* --- the cognitive difficulty of translating component accounting information into a trading decision.
+
+  /Connection to the paper under review/: Blankespoor et al. observe the behavior predicted by the structural identification problem and attribute it to a behavioral/cognitive friction. The structural non-identification result offers a deeper explanation: investors may /rationally/ prefer the aggregate signal (price/returns) over component information (earnings) because individual components cannot be recovered from the aggregate anyway. The "integration cost" is not purely cognitive --- it reflects the genuine structural impossibility of mapping individual accounting components back to their value implications when the security's value depends on multiple parameters. The rational response to an underdetermined system is to rely on the aggregate and ignore the components, which is exactly what Blankespoor et al. document. This reframes their finding from a behavioral anomaly to a rational response to an information-theoretic constraint.
+
 *** Experimental evidence
 
 - *Davis, Korenok & Lightle (2025)*: "The Effects of Public Disclosures and Information Acquisition on Price Informativeness in a Multi-Attribute Asset Market." /Journal of Behavioral and Experimental Finance/, 47, 101084. DOI: 10.1016/j.jbef.2025.101084. A laboratory experiment with a two-component asset of uncertain value. The paper directly tests and confirms that learning individual components from aggregate prices requires strategic disclosure management --- the aggregate price alone does not spontaneously reveal individual attributes.
@@ -392,6 +398,205 @@ The standard theoretical resolution to the dimensionality problem is to add more
 - *Chabakauri (2024, WP)*: Large markets with many assets --- "big data" from many prices.
 
 This /confirms/ that the theoretical literature recognizes the dimensional constraint and resolves it by increasing the number of signals, not by extracting more from a single signal.
+
+** Investor Behaviors Consistent with Structural Non-Identification
+
+A wide range of well-documented investor behaviors --- traditionally attributed to cognitive biases, limited attention, or behavioral frictions --- are consistent with the structural impossibility of decomposing an aggregate price signal into individual valuation components. If the structural non-identification result is taken seriously, many of these behaviors can be reinterpreted not as anomalies requiring behavioral explanation but as /rational responses/ to an information-theoretic constraint.
+
+*** Functional fixation: origins and the behavioral explanation
+
+The concept of "functional fixation" originates in Gestalt psychology (Duncker 1945) and was applied to accounting by *Ijiri, Jaedicke & Knight (1966)*, who argued that decision-makers conditioned to interpret accounting outputs in a particular way will continue to assign the same meaning even when the underlying accounting methods change. *Ashton (1976)* provided the first experimental confirmation: participants did not adjust their decision-making when the costing method changed from variable to absorption costing. *Hand (1990)* extended this to capital markets, showing that stock prices respond to economically meaningless accounting gains/losses from early debt extinguishments as if naive investors are misled by reported income effects.
+
+In this tradition, fixation is understood as a /cognitive/ phenomenon: investors /could/ decompose the signal but /fail to/ due to conditioning or limited processing ability. The structural non-identification result suggests an alternative: for multi-parameter securities, investors /cannot/ decompose the aggregate signal regardless of cognitive sophistication, because the system is mathematically underdetermined.
+
+*** The accrual anomaly as component decomposition failure
+
+The most direct evidence of functional fixation in capital markets comes from the accrual anomaly literature:
+
+- *Sloan (1996)*: Stock prices behave as if investors fixate on total earnings without distinguishing between the differential persistence of accruals vs. cash flows. A long-short strategy based on accrual levels earns approximately 12% annually.
+
+- *Xie (2001)*: Extended Sloan by decomposing total accruals into normal and abnormal (discretionary) components. The anomaly is driven primarily by discretionary accruals, suggesting investors fail to distinguish sub-components /within/ accruals as well --- a nested decomposition failure.
+
+- *Bradshaw, Richardson & Sloan (2001)*: Neither sell-side analysts nor auditors incorporate the predictable future earnings declines associated with high accruals into their forecasts. This extends the decomposition failure from retail investors to /professional intermediaries/, suggesting the problem is not merely naivete.
+
+- *Jegadeesh & Livnat (2006)*: Revenue surprises predict future returns beyond what is captured by earnings surprises alone. The individual components of earnings (revenue vs. expense) are not separately priced, consistent with investors observing only the aggregate and failing to decompose it.
+
+The standard explanation is behavioral: investors are cognitively lazy or biased. The structural alternative: total earnings is a single aggregate signal, and decomposing it into accruals, cash flows, revenue, and expense components is an identification problem analogous to the n-parameters-from-1-price problem. Even a fully rational investor observing only the aggregate cannot uniquely determine the components.
+
+*** Post-earnings-announcement drift as a decomposition problem
+
+Post-earnings-announcement drift (PEAD) --- the tendency for cumulative abnormal returns to continue drifting in the direction of the earnings surprise for 60+ trading days --- is one of the most robust anomalies in finance.
+
+- *Bernard & Thomas (1989, 1990)*: Documented the drift and showed that stock prices partially reflect a naive seasonal random walk model of earnings, as if investors expect earnings similar to the same quarter of the prior year without fully processing the time-series properties.
+
+- *Barberis, Shleifer & Vishny (1998)*: Modeled PEAD as arising from "conservatism" --- slow updating of beliefs in response to new evidence. Their model produces both underreaction (to single announcements) and overreaction (to series of same-sign news).
+
+The standard interpretation of PEAD is that investors underreact to earnings news. But the structural non-identification framework offers a different reading: investors may be uncertain about /what portion of the earnings surprise was already reflected in the pre-announcement price/. If the price signal cannot be decomposed into components, then an investor observing a positive earnings surprise cannot easily determine whether the surprise reflects genuinely new information or information that should already have been priced. The rational response to this uncertainty is to revise gradually --- producing drift.
+
+*** Investor reliance on price over fundamentals
+
+- *Blankespoor, deHaan, Wertz & Zhu (2019)*: When AP automated earnings articles present both earnings news and trailing stock returns side by side, individual investors ignore the earnings content and trade based on trailing returns. The authors attribute this to "integration costs."
+
+- *Jegadeesh & Titman (1993)*: Strategies buying past winners and selling past losers generate significant positive returns over 3-to-12-month holding periods. Momentum trading is fundamentally a strategy of relying on the aggregate price signal rather than decomposing fundamentals.
+
+- *Hong & Stein (1999)*: In their model, "newswatchers" observe private fundamental signals but /cannot extract other newswatchers' information from prices/. Information diffuses gradually because agents cannot fully invert the price signal. The inability to extract multidimensional information from a single price directly causes underreaction, and momentum trading is a rational response.
+
+- *Barber & Odean (2008)*: Individual investors are net buyers of attention-grabbing stocks --- those in the news, experiencing extreme returns, or high abnormal volume. Investors substitute aggregate-level price signals for fundamental component analysis.
+
+- *De Bondt & Thaler (1985, 1987)*: Past losers outperform past winners over 3--5 year horizons (long-term reversal). The combined pattern --- intermediate-term momentum followed by long-term reversal --- is consistent with investors initially relying on aggregate price trends and subsequently correcting when component information eventually resolves through other channels.
+
+The structural reinterpretation: if investors cannot decompose price into components, then the most informative signal available /is/ the aggregate --- past returns. Momentum trading and return-chasing are not irrational; they are optimal given the information constraint. Blankespoor et al.'s "integration costs" are not purely cognitive --- they reflect the structural impossibility of mapping individual accounting components to their value implications when the security's value depends on multiple parameters.
+
+*** Limited attention and rational inattention
+
+A parallel literature models limited processing capacity as a rational constraint rather than a cognitive bias:
+
+- *Sims (2003)*: Agents face a Shannon information-theoretic capacity constraint. The "noise" agents experience is endogenous to their optimal attention allocation, not exogenous as in Grossman-Stiglitz.
+
+- *Peng & Xiong (2006)*: When attention is scarce, investors optimally allocate more capacity to market- and sector-level information than to firm-specific information ("category learning"). This is a direct prediction of the structural problem: when decomposing aggregate signals into components is impossible, the rational response is to process aggregates.
+
+- *Hirshleifer & Teoh (2003)*: Formalized limited attention in the disclosure context. When investors have bounded processing capacity, the /presentation format/ of information --- not just its content --- affects market prices. Different levels of aggregation produce different pricing outcomes. If investors could perfectly decompose aggregates, presentation format would be irrelevant.
+
+- *Hirshleifer, Lim & Teoh (2009)*: The immediate price reaction to a firm's earnings surprise is weaker, and post-announcement drift stronger, when more firms announce earnings on the same day ("distraction"). When investors must divide attention across multiple signals, their ability to process any individual firm's components deteriorates.
+
+- *DellaVigna & Pollet (2009)*: Friday earnings announcements produce 15% weaker immediate responses and 70% larger post-announcement drift. The degree of attention investors allocate directly affects how well they can process component information.
+
+- *Blankespoor, deHaan & Marinovic (2020)*: Propose a three-stage framework for disclosure processing costs: (1) awareness costs, (2) acquisition costs, and (3) integration costs. Even when the first two are eliminated, the third --- "integration" --- remains binding. This is precisely the structural constraint: investors can freely observe price (awareness) and read disclosures (acquisition), but /integrating/ component information into a valuation when the aggregate signal is structurally underdetermined is where the impossibility bites.
+
+The rational inattention literature provides the theoretical complement to the structural result. Sims and followers show that finite capacity makes investors optimally allocate attention to aggregates; the structural non-identification result shows that even /infinite/ capacity would not solve the decomposition problem for a single price signal. The two mechanisms reinforce each other: structural non-identification makes component-level processing literally impossible from price alone, and limited attention makes it costly to acquire the supplementary signals that could help.
+
+*** Stale information reactions
+
+- *Tetlock (2011)*: Firms' stock returns respond to stale news (recycled stories textually similar to recent coverage), and this response partially reverses within a week. Individual investors trade /more aggressively/ on stale news. The standard interpretation is that investors cannot distinguish old from new information.
+
+- *Huberman & Regev (2001)*: EntreMed's stock jumped from $12 to $85 after a /New York Times/ article about cancer drug research that had been published in /Nature/ five months earlier. Investors could not determine from the aggregate price that this information was already incorporated.
+
+The structural reinterpretation: investors responding to stale information may not be "confused" --- they may be rationally responding to /any/ signal that helps them solve the decomposition problem. If price alone cannot tell investors /which/ components are reflected in it, then a news article that identifies a specific component (even if the article is old) provides genuinely useful information: it helps investors attribute portions of the aggregate price to specific fundamentals. The problem is not that investors fail to recognize staleness; it is that they cannot determine from price alone what is already priced.
+
+*** Investor disagreement as a consequence of non-identification
+
+- *Kandel & Pearson (1995)*: Trading volume at earnings announcements cannot be explained without allowing for differential interpretation of the same public signal. Investors receiving identical information decompose it differently.
+
+- *Hong & Stein (2007)*: Advocate for "disagreement models" where heterogeneous beliefs drive prices and volume. When investors "agree to disagree," they do not infer that disagreement implies informational disadvantage.
+
+The structural connection: if a single price cannot reveal $n$ parameters, then investors with different priors about those parameters will /rationally and genuinely/ disagree even when observing the same price. The solution set is an $(n-1)$-dimensional hyperplane, and each investor's posterior will lie at a different point on that hyperplane depending on their prior. Disagreement is not irrational --- it is the inevitable consequence of structural non-identification. This provides a new foundation for disagreement models: the heterogeneity is not ad hoc but arises naturally from the dimensionality mismatch.
+
+*** The structural vs. behavioral debate
+
+Two papers frame the central question:
+
+- *Bloomfield (2002)*: The "Incomplete Revelation Hypothesis" (IRH) proposes that statistics more costly to extract from public data are less completely revealed in market prices. This reframes functional fixation from an irrational bias to a rational response to extraction costs. The IRH predicts the same patterns as the fixation hypothesis but grounds them in rational economics. However, Bloomfield treats the cost as /finite/ --- a matter of degree. The structural non-identification result goes further: for a single price signal with $n > 1$ parameters, the cost is /infinite/ because the decomposition is impossible, not merely expensive.
+
+- *Brav & Heaton (2002)*: Demonstrate that behavioral models (investor irrationality) and rational structural uncertainty models (incomplete information about the economic environment) produce /identical predictions/ for underreaction and overreaction. The rational model, though fully Bayesian, embodies heavy weighting of prior opinion and recent data --- the same features attributed to behavioral biases. This is precisely the paper's point: what the behavioral literature calls "fixation" or "underreaction" may be the rational consequence of structural constraints on what can be learned from price.
+
+The paper under review contributes to this debate by identifying a /specific/ structural constraint --- the dimensionality mismatch between the parameter space and the signal space --- that produces behaviors observationally equivalent to functional fixation, limited attention, underreaction, return-chasing, and disagreement. If the constraint is structural, then the behavioral explanations are not wrong (investors /do/ fixate, /do/ underreact, /do/ chase returns) but are incomplete: they describe the surface behavior without identifying the information-theoretic root cause.
+
+** Competing Explanations in the Empirical Literature
+
+The empirical papers documenting complexity-related anomalies offer explanations that fall into several camps. Critically, /none/ of them identify the structural non-identification mechanism. Understanding what each paper claims --- and what it does not claim --- is essential for positioning the paper's contribution.
+
+*** Camp 1: Information processing costs (the problem is "hard")
+
+*Barinov, Park & Yildizhan (2024)*, "Firm Complexity and Post-Earnings-Announcement Drift" (/Review of Accounting Studies/, 29(1), 527--579), provide the most striking empirical evidence: PEAD is *2x larger* for existing conglomerates and *8x larger* for new conglomerates (those that organically create new business lines). Their explanation: conglomerates have "more costly and difficult" information environments. Evidence: fewer analysts, less expert analysts, larger forecast errors, lower institutional ownership.
+
+*Cohen & Lou (2012)*, "Complicated Firms" (/Journal of Financial Economics/, 104(2), 383--400), show that returns of "pseudo-conglomerates" (portfolios of standalone firms matching a conglomerate's segment composition) predict the actual conglomerate's return next month. A trading strategy exploiting this yields *118 bps per month*. Their explanation: when industry news arrives, simple firms update quickly but conglomerates update with a lag because investors have "limited resources and capacity to collect, interpret, and trade on value-relevant information."
+
+Both papers explicitly reject limits-to-arbitrage as the primary explanation (conglomerates are larger, not smaller, so traditional arbitrage barriers cannot explain the effect). Both invoke the Grossman-Stiglitz tradition of costly information processing.
+
+*What they do not consider*: Both treat the problem as /quantitatively/ harder for complex firms --- more industries to analyze, higher costs per analyst. Neither considers that the problem may be /qualitatively/ impossible: a single stock price is dimensionally insufficient to convey $n$ independent segment fundamentals regardless of analyst sophistication or investor attention.
+
+*** Camp 2: Gradual information diffusion (the problem is "slow")
+
+*Hong, Lim & Stein (2000)*, "Bad News Travels Slowly" (/Journal of Finance/, 55(1), 265--295), attribute momentum to gradual information diffusion. In the Hong & Stein (1999) model, "newswatchers" observe private signals but cannot extract others' information from prices. Information reaches the investing public slowly, and the fewer analysts covering a stock, the slower the diffusion. The effect is asymmetric: much stronger for bad news (managers proactively publicize good news but not bad news).
+
+They explicitly test against and reject:
+- Daniel, Hirshleifer & Subrahmanyam (1998) overconfidence model (which does not predict coverage-dependent momentum)
+- Barberis, Shleifer & Vishny (1998) conservatism/representativeness model (which does not generate cross-sectional predictions tied to coverage)
+- Risk-based explanations (momentum is not compensation for risk)
+
+*What they do not consider*: Analysts are modeled as /conduits/ that accelerate the rate at which existing information reaches investors --- not as providers of additional signal dimensions. The mechanism is about speed, not about solving a dimensional identification problem. Hong & Stein (1999) /assume/ that price is non-invertible (newswatchers "cannot extract" others' information from prices) but do not explain /why/ --- they treat it as a behavioral assumption. The structural non-identification result provides the microfoundation: investors cannot invert the price signal because dim(states) > dim(prices).
+
+*** Camp 3: Additional signals resolve ambiguity (the problem is "solvable with more data")
+
+*Mohanram (2014)*, "Analysts' Cash Flow Forecasts and the Decline of the Accruals Anomaly" (/Contemporary Accounting Research/, 31(4), 1143--1170), shows that analyst cash flow forecasts /implicitly decompose/ earnings into cash flow and accrual components, helping investors assess differential persistence. The accrual anomaly weakens significantly when cash flow forecasts are available. He tests against and survives: hedge fund arbitrage (Green, Hand & Soliman 2011), improved accrual quality, increased market liquidity (Chordia, Subrahmanyam & Tong 2014).
+
+*Li, Ramesh & Shen (2021)*, "Does Voluntary Balance Sheet Disclosure Mitigate Post-Earnings-Announcement Drift?" (/Journal of Accounting and Public Policy/, 40(1)), show that voluntary balance sheet disclosure reduces PEAD through two channels: helping investors assess earnings persistence and reducing information processing costs. The effect is stronger when earnings uncertainty is higher.
+
+*Ettredge, Kwon, Smith & Zarowin (2005)*, "The Impact of SFAS No. 131 Business Segment Data on the Market's Ability to Anticipate Future Earnings" (/The Accounting Review/, 80(3), 773--804), show that SFAS 131 improved FERC (forward earnings response coefficients) for affected firms. Segment data helped investors forecast /aggregate/ future earnings better.
+
+*Park (2011)*, "The Effect of SFAS 131 on the Stock Market's Ability to Predict Industry-wide and Firm-specific Components of Future Earnings" (/Accounting & Finance/, 51(2), 575--607), provides the most striking finding for the structural thesis. He decomposes future earnings into industry-wide and firm-specific components and finds that SFAS 131 improved pricing of the *industry-wide component* but *NOT the firm-specific component*. His explanation: segment data reveals which industries a firm operates in but does not help predict firm-specific performance. He also suggests that the loss of geographic segment data under SFAS 131 offset some gains.
+
+*Connection to structural non-identification*: Park's asymmetric finding is /exactly/ what the structural model predicts. Knowing which segments exist tells investors the "weights" in the sum-of-parts --- it reveals the dimensionality of the problem and helps with industry-level factors that are common across firms. But it does not resolve firm-specific components, which require firm-specific signals. Park does not frame his result in these terms, but the pattern is a direct empirical confirmation of dimensional collapse: segment disclosure collapses the /industry/ dimension but leaves the /firm-specific/ dimension unresolved.
+
+*** Camp 4: Behavioral fixation (the problem is "biased")
+
+*Shi & Zhang (2012)*, "Can the Earnings Fixation Hypothesis Explain the Accrual Anomaly?" (/Review of Accounting Studies/, 17(1), 1--21), derive from a formal analytical model that the profitability of the accrual trading strategy is the product of (a) the earnings response coefficient (how much investors react to aggregate earnings) and (b) the persistence gap between cash flows and accruals (how costly the fixation error is). This is the most rigorous theoretical framework in the accrual anomaly literature.
+
+*What they do not consider*: Their model treats fixation as /behavioral/ --- investors /could/ decompose earnings into cash flows and accruals but /fail to/. The structural alternative: for an investor observing only aggregate price, the decomposition is impossible regardless of cognitive sophistication. Shi & Zhang's persistence gap is a special case of the differential persistence framework with $n = 2$ (cash flows and accruals), but they derive the prediction from behavioral assumptions rather than from the structural impossibility of inverting the price signal.
+
+*** Summary: the key distinction
+
+| Explanation | Representative papers | The problem is... | Solvable with more resources? |
+|---|---|---|---|
+| Processing costs | Barinov et al. (2024), Cohen & Lou (2012) | Hard | Yes (better analysts, more resources) |
+| Gradual diffusion | Hong, Lim & Stein (2000) | Slow | Yes (faster intermediaries) |
+| Limited attention | Peng & Xiong (2006), Hirshleifer & Teoh (2003) | Neglected | Yes (more attention) |
+| Behavioral fixation | Shi & Zhang (2012), Hand (1990) | Biased | Yes (debiasing) |
+| Additional signals | Mohanram (2014), Li et al. (2021), Ettredge et al. (2005) | Incomplete | Yes (more signals) |
+| *Structural non-identification* | *This paper* | *Impossible* | *No* |
+
+Every existing explanation treats the problem as /difficult but in principle solvable/: with better analysts, more attention, faster diffusion, less bias, or more signals, investors could fully price individual components. The structural non-identification result says something qualitatively different: the problem is /mathematically impossible/ from price alone because $\dim(\text{states}) > \dim(\text{prices})$.
+
+This distinction has three important implications:
+
+1. *Reinterpretation*: What existing papers call "processing costs" (Barinov et al., Cohen & Lou), "integration costs" (Blankespoor et al.), or "limited attention" (Hirshleifer & Teoh) may actually be the /rational response/ to structural impossibility. Investors do not decompose conglomerate earnings because they /cannot/, not because they are cognitively limited. The structural explanation is observationally consistent with all documented patterns but provides a more fundamental mechanism.
+
+2. *Park (2011) as quasi-empirical test*: Park's finding that disaggregation helps with industry-wide components but not firm-specific components is difficult to explain under processing-cost or attention stories (why would attention or processing costs differ between industry-wide and firm-specific components?). Under structural non-identification, it is predicted: segment disclosure reveals the industry dimension but leaves the firm-specific dimension unresolved because firm-specific persistence rates require firm-specific signals.
+
+3. *Untested predictions*: The structural framework generates predictions that existing explanations do not:
+   - The /dispersion/ of persistence rates across $n > 2$ components should predict anomaly magnitude (extends Shi & Zhang from $n = 2$)
+   - The number of segments/parameters $n$ should predict anomaly strength directly (not merely as a proxy for processing difficulty)
+   - Sequential signal collection should exhibit diminishing marginal value as dimensions collapse
+
+** Three Types of Signals and the Reinterpretation of Private Information
+
+The discussion above focused on /component observations/ --- direct observations of $\theta_i$ that collapse one dimension of the solution set. But the identification framework reveals two additional types of information that constrain the solution set:
+
+*** Component observations
+
+Direct observations of parameter values: $\theta_i = c$. An earnings disclosure, an analyst cash flow estimate, or a segment report provides this type of signal. Each eliminates one unknown, collapsing the solution set by one dimension.
+
+*** Structural observations
+
+Observations of the /mapping/ from components to price, rather than of a component value. The earnings response coefficient (ERC) is the canonical example. When an investor observes both an earnings surprise $\Delta\theta_{\text{earnings}}$ and the resulting price response $\Delta V$, the ratio $\Delta V / \Delta\theta_{\text{earnings}}$ estimates the partial derivative $\partial V / \partial \theta_{\text{earnings}}$. This constrains the /shape/ of the solution set without pinning down a specific $\theta_i$. ERCs less than one indicate that other components moved in the opposite direction, or that the market had already partially priced the earnings news, or that earnings have implications for other components.
+
+Every ERC regression, FERC analysis, and measure of "price informativeness" in the empirical literature is, in this framework, an estimate of a structural parameter of the identification problem. This gives the ERC literature a new interpretation: it is not merely measuring "how efficiently the market prices earnings" but providing partial solutions to the dimensional decomposition problem.
+
+*** Relative observations
+
+Comparisons of price responses across events. If the market responds strongly to an earnings surprise but weakly to a revenue surprise, this reveals which dimensions the market had already priced and which remain unresolved. Each event-study observation is informative not just about news content but about the /residual structure/ of the identification problem.
+
+*** Reinterpretation of private information
+
+The standard assumption is that "private information" means a component observation --- an insider knows $\theta_i$ before the market. The framework reveals that private information can take any of the three forms above:
+
+- *Component knowledge*: A manager who knows her firm's earnings, costs, and investment plans has direct component observations.
+- *Structural knowledge*: A manager who knows how components combine and persist --- which are transitory, which are permanent, how changes in one component affect others --- has structural observations that constrain the solution set.
+- *Relative knowledge*: An analyst who has observed how this firm's price responds to different types of news has relative observations that help decompose future price movements.
+
+This creates a hierarchy of decomposition ability:
+1. *Managers*: extensive component + structural knowledge → can decompose many dimensions of price
+2. *Specialized analysts*: industry structural knowledge + some component estimates → can decompose several dimensions
+3. *Institutional investors*: proprietary structural models (factor loadings, persistence estimates) → can decompose some dimensions
+4. *Retail investors*: price only → effectively no decomposition ability
+
+This hierarchy maps to empirically observed patterns in forecast accuracy, trading performance, and the value of analyst coverage. It also provides a more precise answer to citet:gelsominLearningHypothesisRevisited2023's question about managerial learning from price: managers /can/ learn from price, but only about dimensions their supplementary signals allow them to isolate. Assumption 3 is conditionally true, and the structural framework specifies the boundary.
+
+*** Connection to the "processing costs" literature
+
+This typology reframes what "processing costs" actually are. In the existing literature (Grossman & Stiglitz: acquisition costs; Bloomfield 2002: extraction costs; Blankespoor et al. 2020: integration costs), processing costs are a generic friction --- a scalar that makes pricing less efficient but could in principle be overcome. The structural framework gives these costs specific content: the "cost" of processing a signal depends on /which type of signal it is/ and /which dimension of the identification problem it addresses/. For component observations, the cost is the cost of acquiring the disclosure. For structural observations, the cost is the cost of estimating the mapping (e.g., running an ERC regression). For dimensions where no signal exists, the "cost" is infinite --- not because processing is hard, but because the required information is not in the available signal set.
+
+This unifies the "informativeness of price" literature and the "value of disclosure" literature, which are usually treated as separate conversations. Price is informationally complete along one dimension (the aggregate) and informationally empty along the remaining $n-1$ orthogonal dimensions. Disclosure is valuable because each disclosure resolves a specific dimension that price cannot. The value of any particular disclosure depends on /which/ dimension it addresses relative to what the existing signal set already conveys --- not on a generic "more information is better" principle. This provides a more disciplined framework than "processing costs are high" or "price is informative" deployed selectively.
 
 ** Synthesis: What Is Unique and What Must Be Cited
 
