@@ -61,7 +61,7 @@ I gratefully acknowledge the contributions of Kris Allee, John Campbell, Vic Lee
 \vspace*{40mm}
 #+BEGIN_abstract
 
-Empirical studies in accounting and finance assume that the market not only incorporates all available information into price, but also forms precise and efficient estimates of individual valuation parameters such as the persistence of earnings. However, prevailing models of investor learning do not provide a mechanism by which investors distinguish between multiple parameters when observing aggregate price movements. I extend the model in citet:grossmanImpossibilityInformationallyEfficient1980 to accommodate multiple parameters and show that this creates a structural identification problem: a single price signal cannot uniquely determine an $n$-dimensional parameter vector for $n > 1$. For any single security whose value depends on more than one parameter, this condition is trivially and always violated. The abstract mathematical principle was established in multi-commodity general equilibrium by citet:radnerRationalExpectationsEquilibrium1979 and citet:jordanGenericExistenceRational1982, but its implication for the single-security investor learning problem --- and for the assumptions embedded in empirical accounting and finance --- has not been drawn. Using an agent-based simulation, I demonstrate that the market prices aggregate *all* information efficiently but does not achieve efficient estimates of *individual parameters*, and that component-level mispricing increases with the number of parameters. This result holds regardless of the sophistication of the updating rule and is driven by the dimensionality mismatch between the information space and the price signal, not by noise or bounded rationality.
+Empirical studies in accounting and finance assume that the market not only incorporates all available information into price, but also forms precise and efficient estimates of individual valuation parameters such as the persistence of earnings. However, prevailing models of investor learning do not provide a mechanism by which investors distinguish between multiple parameters when observing aggregate price movements. I extend the model in citet:grossmanImpossibilityInformationallyEfficient1980 to accommodate multiple parameters and show that this creates a structural identification problem: a single price signal cannot uniquely determine an $n$-dimensional parameter vector for $n > 1$. I derive three results. First, the non-identification forces investors to apply average persistence to the aggregate, generating systematic forecast errors whose expected magnitude is increasing in both the number of components and the cross-sectional dispersion of their persistence rates. Second, each supplementary signal (disclosure, analyst report) that reveals a component value collapses one dimension of the solution set and reduces the forecast error, with the marginal value of a signal depending on which component it addresses. Third, these results generate testable cross-sectional predictions: pricing anomalies should be larger for securities with more components and more heterogeneous persistence profiles. An agent-based simulation confirms that the market prices aggregate information efficiently while maintaining significant dispersion in individual parameter estimates. This result holds regardless of the sophistication of the updating rule and is driven by the dimensionality mismatch between the information space and the price signal, not by noise or bounded rationality.
 
 #+END_abstract
 #+LATEX: \newpage
@@ -215,6 +215,109 @@ This result is immediate from the structure of the problem. The key implication 
 The mathematical principle that a lower-dimensional signal space cannot encode a higher-dimensional state space was established in abstract general equilibrium by citet:radnerRationalExpectationsEquilibrium1979 and citet:jordanGenericExistenceRational1982, who showed that fully-revealing rational expectations equilibria cannot generically exist when the price vector has fewer dimensions than the state space. However, their results concern the existence of equilibrium price /functions/ across multi-commodity economies --- they do not model investor learning, do not characterize what happens when the condition fails, and do not address the single-security setting. Proposition \ref{prop:nonid} applies this principle to the specific context of a single security with $n$ valuation parameters, and the simulation that follows demonstrates what investors' parameter estimates actually look like when they attempt to learn from an aggregate signal that cannot identify the individual components.
 
 This structural non-identification is qualitatively different from the impediments to learning studied in the noisy rational expectations literature. In GS, noise traders perturb the price signal, but the underlying system is identified: removing the noise would allow perfect recovery of $\theta$. In my setting, even in the complete absence of noise --- even if price converges exactly to $V$ --- the individual parameters remain unrecoverable from price alone. The ``noise'' in my model is endogenous and structural, arising from the dimensionality mismatch between the information space and the signal space.
+
+** Forecasting Under Non-Identification
+
+Proposition \ref{prop:nonid} establishes that investors cannot recover individual parameters from price. A natural question is whether this matters: if the aggregate price is correct, what is lost by not knowing the components? The answer depends on whether the components evolve differently over time. In practice, they do: cash flows persist at higher rates than accruals, growth rates differ from discount rates, and some components are transitory while others are permanent. I now formalize the consequences of non-identification for forecasting future values.
+
+\begin{definition}[Differential Persistence]
+\label{def:persistence}
+Each valuation parameter $\theta_i$ evolves over time according to a persistence rate $\alpha_i \in (0,1]$. The security's value one period ahead is:
+\begin{equation}
+V_{t+1} = \sum_{i=1}^{n} \alpha_i \theta_{i,t}
+\end{equation}
+The persistence rates are heterogeneous: $\alpha_i \neq \alpha_j$ for at least some $i \neq j$. The cross-sectional variance of persistence rates is $\text{Var}_n(\boldsymbol{\alpha}) = \frac{1}{n}\sum_{i=1}^{n}(\alpha_i - \bar{\alpha})^2$, where $\bar{\alpha} = \frac{1}{n}\sum_{i=1}^{n}\alpha_i$.
+\end{definition}
+
+\begin{proposition}[Forced Average Persistence]
+\label{prop:forecast}
+Suppose the valuation parameters $\theta_1, \ldots, \theta_n$ are drawn independently from $\mathcal{N}(0, \sigma^2)$. An investor who observes only the aggregate $V_t = \sum_{i=1}^{n}\theta_i$ and knows the persistence vector $\boldsymbol{\alpha}$ but not the individual $\theta_i$ has as her optimal forecast of $V_{t+1}$:
+\begin{equation}
+\hat{V}_{t+1} = \bar{\alpha} \cdot V_t
+\end{equation}
+Her forecast error is:
+\begin{equation}
+\label{eq:ferror}
+V_{t+1} - \hat{V}_{t+1} = \sum_{i=1}^{n}(\alpha_i - \bar{\alpha})\,\theta_i
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Given $V_t = \sum \theta_i$ and the independence and identical distribution of the $\theta_i$, the conditional expectation of each component given the aggregate is $E[\theta_i \mid V_t] = V_t / n$ by symmetry. The optimal forecast is therefore:
+\begin{equation}
+E[V_{t+1} \mid V_t] = \sum_{i=1}^{n} \alpha_i \cdot E[\theta_i \mid V_t] = \sum_{i=1}^{n} \alpha_i \cdot \frac{V_t}{n} = \bar{\alpha} \cdot V_t
+\end{equation}
+The forecast error follows by subtraction: $\sum \alpha_i \theta_i - \bar{\alpha} \sum \theta_i = \sum(\alpha_i - \bar{\alpha})\theta_i$.
+\end{proof}
+
+The key feature of Equation \eqref{eq:ferror} is that the forecast error is /not/ random noise: it is a deterministic function of the true parameter values, weighted by the deviation of each component's persistence from the average. An investor who knew the individual $\theta_i$ would incur zero forecast error. The error arises entirely from the inability to decompose the aggregate, which forces the investor to apply a single average persistence rate to what is in fact a heterogeneous vector.
+
+\begin{proposition}[Expected Squared Forecast Error]
+\label{prop:mse}
+Under the conditions of Proposition \ref{prop:forecast}, the expected squared forecast error is:
+\begin{equation}
+\label{eq:msfe}
+E\left[(V_{t+1} - \hat{V}_{t+1})^2\right] = n\,\sigma^2 \cdot \text{Var}_n(\boldsymbol{\alpha})
+\end{equation}
+This is increasing in both the number of components $n$ and the cross-sectional dispersion of persistence rates $\text{Var}_n(\boldsymbol{\alpha})$. The expected squared forecast error is zero if and only if all persistence rates are equal ($\alpha_i = \bar{\alpha}$ for all $i$).
+\end{proposition}
+
+\begin{proof}
+Since the $\theta_i$ are independent with variance $\sigma^2$:
+\begin{equation}
+E\left[\left(\sum_{i=1}^{n}(\alpha_i - \bar{\alpha})\theta_i\right)^2\right] = \sum_{i=1}^{n}(\alpha_i - \bar{\alpha})^2 \cdot E[\theta_i^2] = \sigma^2 \sum_{i=1}^{n}(\alpha_i - \bar{\alpha})^2 = n\,\sigma^2 \cdot \text{Var}_n(\boldsymbol{\alpha})
+\end{equation}
+The cross terms vanish by independence. The expression is zero if and only if $\alpha_i = \bar{\alpha}$ for all $i$, which requires all persistence rates to be identical.
+\end{proof}
+
+Proposition \ref{prop:mse} provides two testable cross-sectional predictions. First, securities with more valuation components (larger $n$) should exhibit larger systematic forecast errors and, consequently, larger pricing anomalies. Second, holding $n$ fixed, securities whose components have more heterogeneous persistence rates should exhibit larger anomalies. The first prediction is consistent with the finding by citet:barinovFirmComplexityPostEarnings2024 that PEAD is two to eight times larger for conglomerates. The second prediction extends the two-component result of citet:shiEarningsFixation2012 --- who show that the accrual anomaly is increasing in the persistence gap between cash flows and accruals --- to the general $n$-component case. The multi-component version of this prediction, involving the /dispersion/ of persistence rates across $n > 2$ components, has not been tested.
+
+I now characterize how supplementary signals reduce forecast error by collapsing the dimensions of the identification problem.
+
+\begin{proposition}[Dimensional Collapse]
+\label{prop:collapse}
+Suppose an investor observes the aggregate price $V_t$ and additionally observes $k$ component values $\{\theta_j : j \in K\}$, where $K \subset \{1, \ldots, n\}$ with $|K| = k$.
+
+(a) The set of parameter vectors consistent with all observations is an $(n - 1 - k)$-dimensional affine subspace. When $k \geq n - 1$, the parameter vector is uniquely determined.
+
+(b) The investor's optimal forecast is:
+\begin{equation}
+\hat{V}_{t+1} = \sum_{i \in K} \alpha_i \theta_i \;+\; \bar{\alpha}_{-K} \cdot \left(V_t - \sum_{i \in K}\theta_i\right)
+\end{equation}
+where $\bar{\alpha}_{-K} = \frac{1}{n-k}\sum_{i \notin K}\alpha_i$ is the average persistence of the unknown components.
+
+(c) The expected squared forecast error reduces to:
+\begin{equation}
+\label{eq:collapse}
+E\left[(V_{t+1} - \hat{V}_{t+1})^2\right] = (n - k)\,\sigma^2 \cdot \text{Var}_{n-k}(\boldsymbol{\alpha}_{-K})
+\end{equation}
+where $\text{Var}_{n-k}(\boldsymbol{\alpha}_{-K})$ is the cross-sectional variance of persistence rates among the $n - k$ unobserved components.
+
+(d) When $k = n - 1$, one unknown component remains, which is determined by $\theta_{\text{last}} = V_t - \sum_{i \in K}\theta_i$. The forecast error is zero.
+\end{proposition}
+
+\begin{proof}
+(a) The investor has $k + 1$ linear constraints on $n$ unknowns: the aggregate constraint $\sum \theta_i = V_t$ and the $k$ component observations $\theta_j = c_j$ for $j \in K$. These are linearly independent since each component observation involves a different variable. The solution set has dimension $n - (k + 1) = n - 1 - k$. When $k \geq n - 1$, the system has at least $n$ independent constraints, yielding a unique solution.
+
+(b) For the known components, the investor forecasts exactly: $\sum_{i \in K}\alpha_i\theta_i$. For the unknown components, she knows only their aggregate $V_{-K} = V_t - \sum_{i \in K}\theta_i$, and by the same symmetry argument as in Proposition \ref{prop:forecast}, her optimal forecast of $\sum_{i \notin K}\alpha_i\theta_i$ is $\bar{\alpha}_{-K} \cdot V_{-K}$.
+
+(c) The forecast error comes only from the unknown components: $\sum_{i \notin K}(\alpha_i - \bar{\alpha}_{-K})\theta_i$. The expected squared error follows as in Proposition \ref{prop:mse}, with $n$ replaced by $n - k$ and $\boldsymbol{\alpha}$ restricted to the unobserved components.
+
+(d) When $k = n - 1$, $n - k = 1$ and $\text{Var}_1(\cdot) = 0$, so the forecast error is zero.
+\end{proof}
+
+Proposition \ref{prop:collapse} formalizes the value of supplementary signals. Each component observation eliminates one dimension of the solution set and reduces the forecast error. Equation \eqref{eq:collapse} shows that the error reduction depends on /which/ component is revealed: observing a component whose persistence deviates greatly from the remaining average produces a larger error reduction than observing one close to the average. The following corollary makes this precise.
+
+\begin{corollary}[Marginal Value of a Signal]
+\label{cor:marginal}
+Given $k$ observed components, the reduction in expected squared forecast error from additionally observing component $\ell \notin K$ is:
+\begin{equation}
+\Delta \text{MSFE} = (n - k)\,\sigma^2\,\text{Var}_{n-k}(\boldsymbol{\alpha}_{-K}) \;-\; (n - k - 1)\,\sigma^2\,\text{Var}_{n-k-1}(\boldsymbol{\alpha}_{-K \setminus \{\ell\}})
+\end{equation}
+This reduction is largest when $\alpha_\ell$ is the persistence rate most distant from $\bar{\alpha}_{-K}$ among the unobserved components.
+\end{corollary}
+
+This corollary has a direct empirical implication: the most valuable disclosure is the one that addresses the component whose persistence rate is most different from the average of the remaining unknown components. In the context of citet:sloanStockPricesFully1996, if cash flow persistence ($\alpha_{\text{CF}} \approx 0.85$) deviates more from the overall average than accrual persistence ($\alpha_{\text{ACC}} \approx 0.35$), then disclosing cash flows is more valuable than disclosing accruals --- and vice versa, depending on the persistence profile of the other unknown components. More generally, the corollary predicts that the market response to a disclosure should be larger for components with more extreme persistence, because those are the components that resolve more forecast uncertainty.
 
 ** Departures from Grossman and Stiglitz (1980)
 
@@ -636,27 +739,9 @@ As shown in Table [[tbl:sse-errors]], the sum of squared errors across parameter
 
 ** The value of supplementary signals: why components matter for predicting future prices
 
-  If the aggregate price is already correct, a natural question arises: what is the value of knowing individual components? The answer lies in the distinction between /current/ value and /future/ value. The aggregate price today reflects $V_{\text{today}} = \sum_{i=1}^{n} \theta_i$ correctly, but the components $\theta_i$ evolve differently over time. Cash flows persist at a higher rate than accruals. Growth rates differ from discount rates. Some components are transitory, others permanent. Tomorrow's value depends on how each component evolves:
+  Propositions \ref{prop:forecast}--\ref{prop:collapse} establish that non-identification creates systematic forecast errors whose magnitude depends on the number of components and the dispersion of their persistence rates, and that supplementary signals reduce these errors by collapsing dimensions of the solution set. I now illustrate these results with a concrete example and connect them to empirical phenomena.
 
-\begin{equation}
-V_{\text{tomorrow}} = \sum_{i=1}^{n} \alpha_i \theta_i
-\end{equation}
-
-where the persistence parameters $\alpha_i$ differ across components.
-
-  An investor who observes only the aggregate $V$ must forecast $V_{\text{tomorrow}}$ using some weighted average persistence rate applied to the sum, effectively treating all components as equally persistent:
-
-\begin{equation}
-\hat{V}_{\text{tomorrow}} \approx \bar{\alpha} \cdot V_{\text{today}}
-\end{equation}
-
-  An investor who can decompose $V$ into its components can exploit the differential persistence:
-
-\begin{equation}
-\hat{V}_{\text{tomorrow}} = \sum_{i=1}^{n} \alpha_i \theta_i \neq \bar{\alpha} \sum_{i=1}^{n} \theta_i
-\end{equation}
-
-  These forecasts differ whenever the $\alpha_i$ differ, which is generically the case for any real security. *The trading value of component information is not in knowing today's price better --- it is already correct --- but in predicting how today's value will evolve into tomorrow's price.*
+  The core insight is that the trading value of component information lies not in knowing today's price better --- it is already correct in aggregate --- but in predicting how today's value will evolve into tomorrow's price. Proposition \ref{prop:forecast} shows that an investor who observes only the aggregate is forced to apply average persistence $\bar{\alpha}$ to the sum, incurring a forecast error of $\sum(\alpha_i - \bar{\alpha})\theta_i$. An investor who can decompose the aggregate applies the correct persistence to each component and incurs zero forecast error.
 
   A simple example illustrates the mechanism. Suppose a security's value depends on two components: an earnings component $\theta_1$ with persistence $\alpha_1 = 0.9$ and a transitory component $\theta_2$ with persistence $\alpha_2 = 0.3$. Today's true values are $\theta_1 = 8$ and $\theta_2 = 2$, so $V = 10$. The market price has converged to 10 --- the aggregate is correct.
 
@@ -671,15 +756,15 @@ where the persistence parameters $\alpha_i$ differ across components.
 
   All four investors agree on today's price ($V = 10$), but their forecasts of tomorrow's price range from 4.8 to 8.4. The correct forecast is 7.8, but only an investor who knows the true decomposition can compute it. The range of possible future values --- from $\alpha_2 \cdot V = 3.0$ (if the entire value is transitory) to $\alpha_1 \cdot V = 9.0$ (if the entire value is persistent) --- is the direct consequence of non-identification. Each point on the solution hyperplane maps to a different $V_{\text{tomorrow}}$.
 
-  Now suppose an earnings release reveals $\theta_1 = 8$. The investor who observes this can compute $\theta_2 = V - \theta_1 = 2$ and forecast $V_{\text{tomorrow}} = 0.9(8) + 0.3(2) = 7.8$ exactly. The supplementary signal has collapsed the solution set from a line (one-dimensional) to a point (zero-dimensional), eliminating all forecast ambiguity. The trading profit comes from the difference between the informed investor's forecast (7.8) and the market's forecast, which is based on whatever average persistence the uninformed investors implicitly apply to the aggregate.
+  Now suppose an earnings release reveals $\theta_1 = 8$. The investor who observes this can compute $\theta_2 = V - \theta_1 = 2$ and forecast $V_{\text{tomorrow}} = 0.9(8) + 0.3(2) = 7.8$ exactly. This is Proposition \ref{prop:collapse} at work: the supplementary signal has collapsed the solution set from a line (one-dimensional) to a point (zero-dimensional), eliminating all forecast ambiguity. The trading profit comes from the difference between the informed investor's forecast (7.8) and the market's forecast, which is based on whatever average persistence the uninformed investors implicitly apply to the aggregate.
 
-  This example extends naturally to $n$ components. With $n$ components and only the aggregate price observed, the solution set is an $(n-1)$-dimensional hyperplane, and the range of possible future values is correspondingly wide. Each supplementary signal that pins down one component collapses one dimension and narrows the forecast range. The first signal is the most valuable: it reduces the dimensionality from $n-1$ to $n-2$ and eliminates the widest band of forecast uncertainty. Subsequent signals provide diminishing but still positive marginal value.
+  As Proposition \ref{prop:collapse} shows, this extends naturally to $n$ components. With $n$ components and only the aggregate price observed, the expected squared forecast error is $n\sigma^2 \text{Var}_n(\boldsymbol{\alpha})$ (Proposition \ref{prop:mse}). Each supplementary signal that pins down one component reduces the residual error to $(n-k)\sigma^2 \text{Var}_{n-k}(\boldsymbol{\alpha}_{-K})$. By Corollary \ref{cor:marginal}, the greatest error reduction comes from revealing the component whose persistence deviates most from the average of the remaining unknowns.
 
   This is precisely the mechanism underlying the accrual anomaly documented by citet:sloanStockPricesFully1996. The market observes aggregate earnings $E = \text{CF} + \text{ACC}$ and prices the security correctly given that aggregate. But cash flows ($\alpha_{\text{CF}}$ high) are more persistent than accruals ($\alpha_{\text{ACC}}$ low), so a firm with high accruals and low cash flows has a current price that is too high relative to its /future/ value. An investor who can decompose $E$ into cash flows and accruals can predict this reversion and trade profitably. The market, unable to decompose the aggregate, implicitly forecasts with $\bar{\alpha}$ and is systematically wrong about future values.
 
   The same logic explains the profitability of trading on post-earnings-announcement drift. An earnings surprise identifies a change in a specific component ($\Delta\theta_{\text{earnings}}$). An investor who observes the surprise directly knows /which/ component changed and can predict how the security's value will evolve given the persistence of that component. The market, observing only the aggregate price change, cannot attribute it to a specific component and therefore adjusts gradually as supplementary signals arrive. The drift represents the period during which the market is resolving the decomposition problem, and informed investors can trade profitably during that window.
 
-  More generally, each supplementary signal that resolves one dimension of the identification problem reduces the dimensionality of the remaining solution set. With price alone, the investor faces $n$ unknowns and one equation: the solution set is an $(n-1)$-dimensional hyperplane. Observing one component directly (e.g., earnings) reduces the system to $n-1$ unknowns and one equation (the remaining components must sum to $V - \theta_{\text{earnings}}$), yielding an $(n-2)$-dimensional solution set. Each additional component signal collapses one further dimension. The system is fully determined only when all $n$ components are independently observed --- a condition that is never met in practice, but that disclosure, analyst reports, and other information channels can /approximate/.
+  More generally, the system is fully determined only when $n - 1$ components are independently observed (Proposition \ref{prop:collapse}(d)) --- a condition that is never met in practice, but that disclosure, analyst reports, and other information channels can /approximate/. The practical implication is that each additional signal provides diminishing but positive marginal value, and the most valuable signals are those addressing the components with the most extreme persistence rates.
 
   However, direct component observations are not the only signals that help resolve the identification problem. There are in fact three distinct types of information that constrain the solution set:
 
@@ -702,7 +787,7 @@ where the persistence parameters $\alpha_i$ differ across components.
   The implication for empirical research design is direct: studies that assume investors learn individual parameters from aggregate price movements are implicitly assuming that the identification problem has been resolved. My results suggest that this assumption should be stated explicitly and defended, not taken as a default. The degree to which investors can learn individual parameters depends on the availability of supplementary signals --- direct disclosures, analyst decompositions, media coverage, and social media discussion --- that help resolve the dimensions of the underdetermined system. The structural non-identification result does not imply that investors /never/ learn individual parameters; it implies that they cannot do so from price alone, and that the informational ecosystem surrounding a security determines how many dimensions of the identification problem can be resolved in practice.
 
 * Conclusion
-  In this paper I extend prior models, in which investors perfectly learn a single valuation parameter from price, to a setting in which price responds to multiple valuation parameters. I show that this creates a structural identification problem: a single scalar price constrains investors to an $(n-1)$-dimensional hyperplane of parameter vectors, all of which are consistent with the observed price. Using an agent-based simulation, I find that the market continues to converge on the correct price, but that there is significant variation in investors' estimates of the individual valuation parameters. As a result, there remains significant disagreement among investors about the appropriate value of a particular parameter. I conclude that market efficiency in the aggregate, in which market price reflects all available information, is distinct from the market efficiently pricing the individual informational components that lead to that value. My evidence also suggests that individual parameter errors are increasing in the number of parameters.
+  In this paper I extend prior models, in which investors perfectly learn a single valuation parameter from price, to a setting in which price responds to multiple valuation parameters. I show that this creates a structural identification problem: a single scalar price constrains investors to an $(n-1)$-dimensional hyperplane of parameter vectors, all of which are consistent with the observed price (Proposition \ref{prop:nonid}). When valuation components evolve at different rates, this non-identification forces investors to apply average persistence to the aggregate, generating systematic forecast errors whose expected magnitude is $n\sigma^2 \text{Var}_n(\boldsymbol{\alpha})$ --- increasing in both the number of components and the dispersion of their persistence rates (Propositions \ref{prop:forecast}--\ref{prop:mse}). Supplementary signals reduce these errors by collapsing dimensions of the solution set, with each signal's marginal value depending on which component it reveals (Proposition \ref{prop:collapse}, Corollary \ref{cor:marginal}). An agent-based simulation confirms that the market converges on the correct aggregate price while maintaining significant dispersion in individual parameter estimates, and that component-level errors increase with $n$. I conclude that market efficiency in the aggregate, in which market price reflects all available information, is distinct from the market efficiently pricing the individual informational components that lead to that value.
 
   The structural non-identification I describe is qualitatively different from the impediments to learning studied in prior models of noisy rational expectations. In those models (citet:grossmanImpossibilityInformationallyEfficient1980, citet:fischerReportingBias2000, citet:felthamPerformanceMeasureCongruity1994), incomplete learning arises because exogenous noise perturbs a fundamentally identified signal; removing the noise would restore perfect learning. In my setting, even in the complete absence of noise, a single price cannot reveal individual parameters when $n > 1$. The mathematical principle that a lower-dimensional signal space cannot encode a higher-dimensional state space was established by citet:radnerRationalExpectationsEquilibrium1979, citet:allenStrictRationalExpectations1982, and citet:jordanGenericExistenceRational1982 as an abstract existence result for multi-commodity general equilibrium. For a single security, this condition is trivially and always violated: any security whose value depends on more than one parameter presents investors with an underdetermined system. Yet neither the theoretical finance literature (which has maintained the dimensional condition by modeling single-parameter securities or adding securities to match) nor the empirical literature (which assumes investors learn individual parameters from price) has drawn this implication. My contribution is to apply this principle to the single-security investor learning problem, to demonstrate computationally that aggregate price convergence coexists with component-level non-identification, to measure how component errors scale with $n$, and to connect the result to the assumptions embedded in empirical accounting and finance research.
 
@@ -712,9 +797,9 @@ where the persistence parameters $\alpha_i$ differ across components.
 
   I would also note that my model of investor learning is deliberately simple so as to isolate the identification problem from other features of the trading environment. Other models of learning may allow investors to achieve more efficient parameter estimates by, for example, using the time-series of prices or trading volumes to extract additional information. However, no mechanism can allow investors to learn /perfectly/ from a single contemporaneous price when there is more than a single valuation parameter, because the system is structurally underidentified.
 
-  An important implication of structural non-identification is that the value of knowing individual components lies not in assessing current price --- which is already correct in aggregate --- but in predicting /future/ prices. Because components evolve at different rates (cash flows persist more than accruals, growth rates differ from discount rates), an investor who can decompose the aggregate can forecast future values more accurately than one who treats the aggregate as a sufficient statistic. This provides a structural explanation for well-documented anomalies: the accrual anomaly (citet:sloanStockPricesFully1996) arises because the market cannot distinguish high-persistence from low-persistence components; post-earnings-announcement drift (citet:bernardPostEarningsAnnouncementDriftDelayed1989,bernardEvidenceThatStock1990) arises as the market gradually resolves which component changed; and investor reliance on trailing returns over fundamental information (citet:blankespoorWhyIndividualInvestors2019) reflects the rational preference for the aggregate signal when component decomposition is structurally impossible.
+  As Propositions \ref{prop:forecast}--\ref{prop:mse} establish, the value of knowing individual components lies not in assessing current price --- which is already correct in aggregate --- but in predicting /future/ prices. Because components evolve at different rates, an investor who can decompose the aggregate can forecast future values more accurately than one who is forced to apply average persistence to the sum. The expected squared forecast error, $n\sigma^2\text{Var}_n(\boldsymbol{\alpha})$, provides two testable cross-sectional predictions: anomalies should be larger for securities with more components and for securities whose components have more heterogeneous persistence. This provides a structural explanation for well-documented anomalies: the accrual anomaly (citet:sloanStockPricesFully1996) arises because the market cannot distinguish high-persistence from low-persistence components; post-earnings-announcement drift (citet:bernardPostEarningsAnnouncementDriftDelayed1989,bernardEvidenceThatStock1990) arises as the market gradually resolves which component changed; and investor reliance on trailing returns over fundamental information (citet:blankespoorWhyIndividualInvestors2019) reflects the rational preference for the aggregate signal when component decomposition is structurally impossible.
 
-  Each supplementary signal --- a disclosure, an analyst report, a media article --- resolves one dimension of the identification problem, reducing the solution set from an $(n-1)$-dimensional hyperplane toward a point. The structural non-identification result thus provides a foundation for understanding the value of disclosure: disaggregated disclosures are valuable not because they contain ``more'' information in a generic sense, but because each separately reported component collapses one dimension of the underdetermined system. Investors are limited in what they can learn from price and likely need to utilize these alternative means to achieve efficient parameter estimates. To the extent that markets are an information technology as well as a means of allocating capital, my study indicates a need for a better understanding of how price interacts with other sources of information to produce investor consensus.
+  Proposition \ref{prop:collapse} establishes that each supplementary signal --- a disclosure, an analyst report, a media article --- resolves one dimension of the identification problem, reducing the expected forecast error from $(n-k)\sigma^2\text{Var}_{n-k}(\boldsymbol{\alpha}_{-K})$ toward zero. By Corollary \ref{cor:marginal}, the most valuable disclosure is the one addressing the component whose persistence deviates most from the mean of the remaining unknowns. The structural non-identification result thus provides a foundation for understanding the value of disclosure: disaggregated disclosures are valuable not because they contain ``more'' information in a generic sense, but because each separately reported component collapses one dimension of the underdetermined system. Investors are limited in what they can learn from price and likely need to utilize these alternative means to achieve efficient parameter estimates. To the extent that markets are an information technology as well as a means of allocating capital, my study indicates a need for a better understanding of how price interacts with other sources of information to produce investor consensus.
 
 \singlespacing
 * Appendices
