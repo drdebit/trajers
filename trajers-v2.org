@@ -62,7 +62,7 @@ I gratefully acknowledge the contributions of Kris Allee, John Campbell, Vic Lee
 \vspace*{40mm}
 #+BEGIN_abstract
 
-Empirical studies in accounting and finance assume that the market not only incorporates all available information into price, but also forms precise and efficient estimates of individual valuation parameters such as the persistence of earnings. However, prevailing models of investor learning do not provide a mechanism by which investors distinguish between multiple parameters when observing aggregate price movements. This paper extends the model in citet:grossmanImpossibilityInformationallyEfficient1980 to accommodate multiple parameters and shows that this creates an identification problem: a single price cannot uniquely determine $n$ individual parameters when $n > 1$. Formal results show that this forces investors to apply average persistence to the aggregate, generating forecast errors that increase in both the number of components and the dispersion of their persistence rates. Each supplementary signal --- a disclosure, an analyst report --- that reveals a component value reduces these errors. An agent-based simulation, implemented in Clojure and included in full as executable source, confirms that the market prices aggregate information efficiently while maintaining significant dispersion in individual parameter estimates. Aggregate market efficiency therefore does not imply efficient pricing of the individual components that make up that aggregate. The paper asks whether the literature ascribes too much power to price in communicating information between investors.
+Empirical studies in accounting and finance assume that the market not only incorporates all available information into price, but also forms precise and efficient estimates of individual valuation parameters such as the persistence of earnings. However, prevailing models of investor learning do not provide a mechanism by which investors distinguish between multiple parameters when observing aggregate price movements. This paper extends the model in citet:grossmanImpossibilityInformationallyEfficient1980 to accommodate multiple parameters and shows that this creates an identification problem: a single price cannot uniquely determine $n$ individual parameters when $n > 1$. This constraint binds even under Bayesian optimality: a fully rational investor's posterior variance for each component remains $\sigma_0^2(n-1)/n$, approaching the prior variance as $n$ grows. Formal results show that non-identification forces investors to apply average persistence to the aggregate, generating forecast errors that increase in both the number of components and the dispersion of their persistence rates. Each supplementary signal --- a disclosure, an analyst report --- that reveals a component value reduces these errors, with the largest reductions coming from components whose persistence is most distant from the average of the remaining unknowns. An agent-based simulation confirms these results under bounded rationality. Aggregate market efficiency therefore does not imply efficient pricing of the individual components that make up that aggregate.
 
 #+END_abstract
 #+LATEX: \newpage
@@ -74,7 +74,7 @@ Empirical studies in accounting and finance assume that the market not only inco
 
   The core insight is one of identification. In existing models, a single price communicates a single unknown parameter, and the system is exactly identified: an investor observing price can, in principle, recover the unknown. When price reflects multiple parameters simultaneously, however, the system becomes underidentified. A single price constrains an \(n\)-dimensional parameter vector to lie on an \(n-1\)-dimensional hyperplane, leaving infinitely many parameter combinations consistent with any observed price. This is not a problem of noise, bounded rationality, or suboptimal updating --- it is a mathematical constraint that applies regardless of investor sophistication.
 
-  The paper derives formal propositions characterizing the identification problem and its consequences for forecasting. Following citet:grossmanImpossibilityInformationallyEfficient1980 (GS), it also develops an agent-based simulation that confirms these results computationally: the market converges on the correct aggregate price while maintaining significant dispersion in individual parameter estimates, consistent with the formal results.
+  The paper derives formal propositions characterizing the identification problem and its consequences for forecasting, showing that the constraint binds even under Bayesian optimality (Proposition \ref{prop:bayesian}). An agent-based simulation confirms these results computationally under bounded rationality: the market converges on the correct aggregate price while maintaining significant dispersion in individual parameter estimates.
 
   This paper makes three contributions. First, although empirical researchers routinely assume that the market ``learns'' or ``estimates'' the value of individual parameters from price, the analysis shows that the market can converge on the correct aggregate price without establishing correct consensus estimates of those parameters. Whether market price aggregates /all/ available information is distinct from whether the market learns /each component/ of information. This helps explain empirical evidence of price drift after earnings announcements (citet:bernardPostEarningsAnnouncementDriftDelayed1989,bernardEvidenceThatStock1990), earnings fixation (citet:sloanStockPricesFully1996), investor reliance on returns over fundamentals (citet:blankespoorWhyIndividualInvestors2019), and investor response to stale information (citet:tetlockAllNewsThats2011,drakeUsefulnessHistoricalAccounting2016a).
 
@@ -140,66 +140,34 @@ where $\theta$ represents the mean of the return distribution. Investors can pur
   Several other studies examine settings where a single signal imperfectly communicates multidimensional information, though the impediment to learning is /noise/ rather than /structural underidentification/. citet:felthamPerformanceMeasureCongruity1994 show that a single performance measure cannot capture multi-dimensional agent effort in a contracting setting, and citet:fischerReportingBias2000 study how reporting bias distorts a single earnings signal. In each case, the perturbation to learning arises from exogenous noise added to a fundamentally /identified/ system: remove the noise and the signal perfectly reveals the unknown. This study identifies a different mechanism: the underidentification is /structural/, arising from the dimensionality mismatch between the parameter space ($n$ unknowns) and the signal space (a single price). Even in the complete absence of noise, a single price cannot uniquely determine the individual parameters. This distinction between /noisy identification/ and /structural non-identification/ has not been drawn in the market learning literature.
 
 * Model
+  :PROPERTIES:
+  :CUSTOM_ID: model
+  :END:
 
-  This section formally states the model assumptions. These assumptions are implemented in an agent-based simulation described in [[#a_sim][Appendix A]], which provides executable code allowing the model to be replicated and extended.
+  This section formalizes the identification problem and its consequences. The model requires only three assumptions: the structure of the security's value, the information available to investors, and the convergence of price.
 
-** Formal Setup
+** Setup
 
   Consider a single risky security whose fundamental value $V$ is determined by $n$ valuation parameters:
 
 \begin{assumption}[Security Value]
 \label{a:security}
-The security has a true value $V = \sum_{i=1}^{n} \theta_i$, where $\boldsymbol{\theta} = (\theta_1, \ldots, \theta_n)$ is the vector of valuation parameters. Each $\theta_i$ is drawn independently from $\mathcal{N}(0, 1)$.
+The security has a true value $V = \sum_{i=1}^{n} \theta_i$, where $\boldsymbol{\theta} = (\theta_1, \ldots, \theta_n)$ is the vector of valuation parameters. Each $\theta_i$ is drawn independently from $\mathcal{N}(0, \sigma^2)$.
 \end{assumption}
 
-\begin{assumption}[Investor Types]
-\label{a:investors}
-There are $N$ investors indexed by $j = 1, \ldots, N$. A fraction $\lambda \in (0,1)$ are \emph{informed} and the remainder are \emph{uninformed}. The informed/uninformed status of each investor is fixed throughout the trading process.
-\end{assumption}
-
-\begin{assumption}[Information Endowments]
+\begin{assumption}[Information Structure]
 \label{a:information}
-Each informed investor $j \in \mathcal{I}$ knows the true parameter vector: $\hat{\boldsymbol{\theta}}^j = \boldsymbol{\theta}$. Each uninformed investor $j \in \mathcal{U}$ holds a prior $\hat{\boldsymbol{\theta}}^j = (\hat{\theta}_1^j, \ldots, \hat{\theta}_n^j)$, where each $\hat{\theta}_i^j$ is drawn independently from $\mathcal{N}(0, 1)$.
+There are two classes of investor. \emph{Informed} investors know the true parameter vector $\boldsymbol{\theta}$. \emph{Uninformed} investors hold a prior $\hat{\boldsymbol{\theta}}^j = (\hat{\theta}_1^j, \ldots, \hat{\theta}_n^j)$ but do not observe any individual component directly.
 \end{assumption}
 
-The informed fraction is set exogenously rather than derived from an information acquisition decision as in GS. The focus is what happens /after/ some investors have become informed --- specifically, how well uninformed investors can learn individual parameters from the price signal generated by trading. Setting $\lambda$ exogenously is equivalent to examining GS at a particular equilibrium point and asking what uninformed investors can learn at that point. Uninformed investors' priors are drawn from $\mathcal{N}(0,1)$, the same distribution that generates the true parameters, so priors are calibrated to the distribution of fundamentals even though individual investors' priors will generally not equal the true values.
-
-\begin{assumption}[Market Price]
-\label{a:price}
-The market maintains a single scalar price $p_t$ at each time $t$. The initial price is $p_0 = V + \eta$, where $\eta \sim \mathcal{N}(0,1)$, so that price starts near but not at the true value. The price is updated according to a simple order imbalance rule:
-\begin{equation}
-p_{t+1} = p_t + \delta \cdot \text{sgn}\left(\sum_{j=1}^{N} d_j^t \right)
-\end{equation}
-where $\delta = 0.01$ is the tick size and $d_j^t \in \{-1, 0, 1\}$ is investor $j$'s order at time $t$.
+\begin{assumption}[Price Convergence]
+\label{a:convergence}
+The market price $p$ converges to the true aggregate value: $p \to V = \sum_{i=1}^{n} \theta_i$. This is a maintained assumption consistent with models of competitive price formation in the presence of informed traders (citet:grossmanImpossibilityInformationallyEfficient1980, citet:godeAllocativeEfficiencyMarkets1993). The agent-based simulation in [[#a_sim][Appendix A]] confirms that this convergence obtains under specific trading and updating rules.
 \end{assumption}
 
-Note the absence of noise traders. In GS, noise traders are required to prevent price from perfectly revealing $\theta$, which would eliminate the incentive to become informed. In the multi-parameter setting, noise traders are unnecessary: the identification problem itself prevents perfect revelation of individual parameters. In the single-parameter case, the model /does/ achieve perfect convergence (consistent with GS without noise traders), which serves as the benchmark for demonstrating that the multi-parameter result is driven by dimensionality, not by noise. More generally, the identification problem does not depend on the specific price mechanism: any process that maps $n$ parameters to a single scalar price produces the same structural underidentification.
+The model deliberately omits the specific mechanisms of trading and belief updating. Whether investors trade unit quantities or continuous demand schedules, whether they update by Bayesian inference or simple heuristics, does not affect the identification result. Aggregate price convergence is well established both theoretically (citet:grossmanImpossibilityInformationallyEfficient1980) and computationally (citet:godeAllocativeEfficiencyMarkets1993, and the simulation in [[#a_sim][Appendix A]]). The question is what can be learned from such a price once it has converged.
 
-\begin{assumption}[Trading Rule]
-\label{a:trading}
-Each investor submits a unit order based on the comparison of her aggregate prior to the current price:
-\begin{equation}
-d_j^t = \begin{cases} 1 & \text{if } \sum_{i=1}^{n} \hat{\theta}_i^j > p_t \\ -1 & \text{if } \sum_{i=1}^{n} \hat{\theta}_i^j < p_t \\ 0 & \text{if } \sum_{i=1}^{n} \hat{\theta}_i^j = p_t \end{cases}
-\end{equation}
-\end{assumption}
-
-The model adopts a simple unit-demand trading rule rather than the continuous demand functions in GS, which depend on risk aversion parameters. The identification problem does not depend on demand elasticity: whether an investor trades 1 share or 100, the price signal contains only aggregate information. Because informed investors trade on $\sum_i \theta_i = V$ and constitute a majority ($\lambda > 0.5$), the order imbalance will tend to push $p_t$ toward $V$, ensuring price convergence.
-
-\begin{assumption}[Belief Updating]
-\label{a:updating}
-Informed investors do not update. Uninformed investors update their prior at time $t$ if price fails to move toward their prior (indicating that their prior is inconsistent with the majority of investors). When an uninformed investor $j$ updates, she:
-1. Selects a parameter index $k$ uniformly at random from her uninformed parameters.
-2. Computes the inferred value of $\theta_k$ from price, holding her other parameter estimates fixed:
-\begin{equation}
-\tilde{\theta}_k^j = p_t - \sum_{i \neq k} \hat{\theta}_i^j
-\end{equation}
-3. Updates her estimate by averaging with the inferred value:
-\begin{equation}
-\hat{\theta}_k^{j,\text{new}} = \frac{\hat{\theta}_k^j + \tilde{\theta}_k^j}{2}
-\end{equation}
-\end{assumption}
-
-The choice of averaging as an updating rule is deliberately simple. The results do not depend on this specific rule. The core result --- that individual parameter estimates do not converge to their true values --- follows from the structure of the information environment, as shown next.
+Note the absence of noise traders. In GS, noise traders are required to prevent price from perfectly revealing $\theta$, which would eliminate the incentive to become informed. In the multi-parameter setting, noise traders are unnecessary: the identification problem itself prevents perfect revelation of individual parameters. More generally, the identification problem does not depend on the specific price mechanism: any process that maps $n$ parameters to a single scalar price produces the same structural underidentification.
 
 ** The Identification Problem
 
@@ -214,9 +182,35 @@ Let $V = \sum_{i=1}^{n} \theta_i$ and suppose that the market price $p$ converge
 which is an $(n-1)$-dimensional hyperplane in $\mathbb{R}^n$. In particular, $|\mathcal{S}(p)| = \infty$ for $n > 1$.
 \end{proposition}
 
-This result is immediate from the structure of the problem. The key implication is that no updating rule --- whether averaging, OLS, or full Bayesian inference --- can uniquely recover the parameter vector $\boldsymbol{\theta}$ from the scalar price $p$ when $n > 1$. The system has $n$ unknowns and one equation, leaving $n - 1$ degrees of freedom. This is not a matter of noise or bounded rationality; it is a constraint on the information content of the signal itself. Note that this condition is trivially violated for any security whose value depends on more than one parameter --- which is to say, for any real security.
+This result is immediate from the structure of the problem. The system has $n$ unknowns and one equation, leaving $n - 1$ degrees of freedom. This is not a matter of noise or bounded rationality; it is a constraint on the information content of the signal itself. The condition is trivially violated for any security whose value depends on more than one parameter --- which is to say, for any real security.
 
-As discussed in Section [[#litreview][2]], the mathematical principle that a lower-dimensional signal space cannot encode a higher-dimensional state space was established by citet:radnerRationalExpectationsEquilibrium1979 and citet:jordanGenericExistenceRational1982, but their results concern multi-commodity economies rather than investor learning from a single security's price. Proposition \ref{prop:nonid} applies this principle to the single-security setting, and the simulation results below demonstrate what investors' parameter estimates actually look like when they attempt to learn from an aggregate signal that cannot identify the individual components.
+A natural question is whether a sufficiently sophisticated investor could overcome this constraint. The following proposition shows that even a fully Bayesian investor --- one who updates optimally given all available information --- cannot resolve the identification problem from price alone.
+
+\begin{proposition}[Bayesian Non-Resolution]
+\label{prop:bayesian}
+Suppose an uninformed investor holds a prior $\boldsymbol{\theta} \sim \mathcal{N}(\boldsymbol{\mu}_0, \sigma_0^2 I_n)$ and observes the converged price $p = \sum_{i=1}^{n}\theta_i$. Her posterior is:
+\begin{equation}
+\boldsymbol{\theta} \mid p \;\sim\; \mathcal{N}\!\left(\boldsymbol{\mu}_0 + \frac{1}{n}\,\mathbf{1}(p - \mathbf{1}'\boldsymbol{\mu}_0),\;\; \sigma_0^2\left(I_n - \frac{1}{n}\,\mathbf{1}\mathbf{1}'\right)\right)
+\end{equation}
+where $\mathbf{1}$ is the $n$-vector of ones. The posterior has three properties:
+\begin{enumerate}
+\item The posterior mean for each component is $\hat{\theta}_i = \mu_{0,i} + \frac{1}{n}(p - \sum_j \mu_{0,j})$: the prior mean shifted uniformly by $\frac{1}{n}$ of the aggregate surprise. The investor has no basis for allocating the surprise differentially across components.
+\item The posterior variance for each component is:
+\begin{equation}
+\text{Var}(\theta_i \mid p) = \sigma_0^2\,\frac{n-1}{n}
+\end{equation}
+which approaches $\sigma_0^2$ (the prior variance) as $n$ grows. A single price observation reduces individual-component uncertainty by only $\frac{1}{n}$.
+\item The posterior is concentrated on the hyperplane $\mathcal{S}(p)$: the covariance matrix has rank $n - 1$, with the eigenvector $\mathbf{1}/\sqrt{n}$ (the ``aggregate direction'') having eigenvalue zero. The investor is certain of the sum but uncertain of the decomposition.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+By the standard Gaussian conjugate update for a linear observation $p = \mathbf{1}'\boldsymbol{\theta}$ with prior $\boldsymbol{\theta} \sim \mathcal{N}(\boldsymbol{\mu}_0, \sigma_0^2 I_n)$, the posterior mean is $\boldsymbol{\mu}_0 + \sigma_0^2\mathbf{1}(\mathbf{1}'\sigma_0^2 I_n\mathbf{1})^{-1}(p - \mathbf{1}'\boldsymbol{\mu}_0) = \boldsymbol{\mu}_0 + \frac{1}{n}\mathbf{1}(p - \mathbf{1}'\boldsymbol{\mu}_0)$ and the posterior covariance is $\sigma_0^2 I_n - \sigma_0^2\mathbf{1}(\mathbf{1}'\sigma_0^2 I_n \mathbf{1})^{-1}\mathbf{1}'\sigma_0^2 = \sigma_0^2(I_n - \frac{1}{n}\mathbf{1}\mathbf{1}')$. The diagonal entries of this matrix are $\sigma_0^2(1 - 1/n) = \sigma_0^2(n-1)/n$. The eigenvalues of $I_n - \frac{1}{n}\mathbf{1}\mathbf{1}'$ are $1 - n/n = 0$ (eigenvector $\mathbf{1}/\sqrt{n}$) and $1 - 0 = 1$ (multiplicity $n-1$, eigenvectors orthogonal to $\mathbf{1}$), confirming that the posterior is rank $n-1$ and concentrated on $\mathcal{S}(p)$.
+\end{proof}
+
+Proposition \ref{prop:bayesian} establishes that the non-identification result is not an artifact of any particular updating rule. The bottleneck is not how the investor processes the signal but how much information the signal contains. A single price carries exactly one dimension of information regardless of investor sophistication. Bayesian optimality distributes the aggregate information evenly across components, and the posterior point estimate remains dominated by the prior. The agent-based simulation in Section [[#results][4]] confirms that the same non-identification manifests under bounded rationality with a simple heuristic updating rule.
+
+As discussed in Section [[#litreview][2]], the mathematical principle that a lower-dimensional signal space cannot encode a higher-dimensional state space was established by citet:radnerRationalExpectationsEquilibrium1979 and citet:jordanGenericExistenceRational1982, but their results concern multi-commodity economies rather than investor learning from a single security's price. Propositions \ref{prop:nonid} and \ref{prop:bayesian} apply this principle to the single-security setting and show that it binds even under optimal inference.
 
 This identification problem is qualitatively different from the impediments to learning studied in the noisy rational expectations literature. In GS, noise traders perturb the price signal, but the underlying system is identified: removing the noise would allow perfect recovery of $\theta$. In this setting, even in the complete absence of noise --- even if price converges exactly to $V$ --- the individual parameters remain unrecoverable from price alone. The ``noise'' in this model is endogenous, arising from the dimensionality mismatch between the information space and the signal space.
 
@@ -323,8 +317,20 @@ This reduction is largest when $\alpha_\ell$ is the persistence rate most distan
 
 This corollary has a direct empirical implication: the most valuable disclosure is the one that addresses the component whose persistence rate is most different from the average of the remaining unknown components. In the context of citet:sloanStockPricesFully1996, if cash flow persistence ($\alpha_{\text{CF}}$, high) deviates more from the overall average than accrual persistence ($\alpha_{\text{ACC}}$, low), then disclosing cash flows is more valuable than disclosing accruals --- and vice versa, depending on the persistence profile of the other unknown components. More generally, the corollary predicts that the market response to a disclosure should be larger for components with more extreme persistence, because those are the components that resolve more forecast uncertainty.
 
-* Results
-  Having established the formal properties of the identification problem, this section tests whether they manifest in a computational setting. Propositions \ref{prop:nonid}--\ref{prop:mse} predict that (1) a single price converges to the correct aggregate value, (2) individual parameter estimates remain dispersed along the solution hyperplane $\mathcal{S}(p)$, and (3) forecast errors increase with the number of components. The agent-based simulation confirms predictions (1) and (2) directly with $N = 500$ investors ($\lambda = 0.6$ informed, $0.4$ uninformed) per market, and parameter-estimation errors increase with $n$, consistent with the dimensionality argument underlying Proposition \ref{prop:nonid}. Full implementation details and source code are provided in [[#a_sim][Appendix A]].
+* Simulation Evidence
+  :PROPERTIES:
+  :CUSTOM_ID: results
+  :END:
+
+  The propositions above derive the identification problem and its consequences from the structure of the information environment alone, without specifying how investors trade or update beliefs. To verify that these results manifest in a concrete market setting --- and to visualize what non-identification looks like in practice --- this section reports results from an agent-based simulation.
+
+** Simulation Design
+
+  The simulation creates a market of $N = 500$ investors, of whom a fraction $\lambda = 0.6$ are informed (they know $\boldsymbol{\theta}$) and the remainder are uninformed (they hold independent random priors drawn from $\mathcal{N}(0,1)$). Each investor submits a unit buy or sell order based on whether her aggregate prior exceeds or falls below the current price. The price adjusts by $\pm 0.01$ per round based on net order imbalance. Uninformed investors update their priors by selecting a random parameter and partially revising it toward its value implied by the current price. The precise trading and updating rules are stated formally and implemented in full in [[#a_sim][Appendix A]].
+
+  This updating rule is deliberately simple and suboptimal. As Proposition \ref{prop:bayesian} shows, the identification problem persists even under Bayesian optimality. The simulation demonstrates that it also persists under bounded rationality with a simple heuristic --- if anything, the non-identification is /more/ pronounced because the heuristic updating introduces additional dispersion beyond the structural minimum.
+
+** Results
 
   The analysis first examines the single-parameter case ($n = 1$), which serves as a benchmark. In this case, the system is exactly identified: there is one unknown ($\theta_1$) and one signal ($p$). Consistent with GS, both the market price and uninformed investors' priors converge to the true value $V = \theta_1$, as shown in Figure [[fig:1-param-price]]. Price convergence implies parameter convergence, as Proposition \ref{prop:nonid} predicts for $n = 1$. Markets converge in roughly 87 trading rounds on average.
 
@@ -468,7 +474,7 @@ where $\theta_i^m$ is the true value of parameter $i$ in market $m$ and $\bar{\h
   The implication for empirical research design is that studies assuming investors learn individual parameters from aggregate price movements are implicitly assuming that the identification problem has been resolved. The results suggest that this assumption should be stated explicitly and defended, not taken as a default. The degree to which investors can learn individual parameters depends on the availability of supplementary signals --- direct disclosures, analyst decompositions, media coverage, and social media discussion --- that help resolve the underdetermined system. These results do not imply that investors /never/ learn individual parameters; they imply that investors cannot do so from price alone, and that the informational ecosystem surrounding a security determines how much of the identification problem can be resolved in practice.
 
 * Conclusion
-  This paper extends prior models, in which investors perfectly learn a single valuation parameter from price, to a setting in which price responds to multiple valuation parameters. The analysis shows that this creates an identification problem: a single price constrains investors to an \(n-1\)-dimensional hyperplane of parameter vectors, all of which are consistent with the observed price (Proposition \ref{prop:nonid}). When valuation components evolve at different rates, investors who cannot decompose the aggregate are forced to apply average persistence, generating forecast errors that increase in both the number of components and the dispersion of their persistence rates (Propositions \ref{prop:forecast}--\ref{prop:mse}). Supplementary signals reduce these errors, with each signal's value depending on which component it reveals (Proposition \ref{prop:collapse}, Corollary \ref{cor:marginal}). The agent-based simulation confirms that the market converges on the correct aggregate price while maintaining significant dispersion in individual parameter estimates, and that component-level errors increase with $n$. Aggregate market efficiency --- in which price reflects all available information --- is therefore distinct from the market efficiently pricing the individual informational components that compose that value.
+  This paper extends prior models, in which investors perfectly learn a single valuation parameter from price, to a setting in which price responds to multiple valuation parameters. The analysis shows that this creates an identification problem: a single price constrains investors to an \(n-1\)-dimensional hyperplane of parameter vectors, all of which are consistent with the observed price (Proposition \ref{prop:nonid}). This constraint binds even under Bayesian optimality: the posterior variance for each component is $\sigma_0^2(n-1)/n$, approaching the prior variance as $n$ grows (Proposition \ref{prop:bayesian}). When valuation components evolve at different rates, investors who cannot decompose the aggregate are forced to apply average persistence, generating forecast errors that increase in both the number of components and the dispersion of their persistence rates (Propositions \ref{prop:forecast}--\ref{prop:mse}). Supplementary signals reduce these errors, with each signal's value depending on which component it reveals (Proposition \ref{prop:collapse}, Corollary \ref{cor:marginal}). An agent-based simulation confirms these results under bounded rationality, showing that the market converges on the correct aggregate price while maintaining significant dispersion in individual parameter estimates. Aggregate market efficiency --- in which price reflects all available information --- is therefore distinct from the market efficiently pricing the individual informational components that compose that value.
 
   This identification constraint is qualitatively different from the impediments to learning in prior noisy rational expectations models (citet:grossmanImpossibilityInformationallyEfficient1980, citet:fischerReportingBias2000, citet:felthamPerformanceMeasureCongruity1994). In those settings, incomplete learning arises from exogenous noise perturbing a fundamentally identified signal; removing the noise restores perfect learning. Here, even without noise, a single price cannot reveal individual parameters when $n > 1$. The dimensional principle underlying this result is well established in general equilibrium theory (citet:radnerRationalExpectationsEquilibrium1979, citet:jordanGenericExistenceRational1982, citet:allenStrictRationalExpectations1982), but has not previously been applied to single-security investor learning or connected to the accounting literature's assumptions about how investors process earnings components. To be clear about what the paper does and does not claim: the analysis does not argue that markets are inefficient, nor that investors can never learn individual component values. Markets may well be efficient in the aggregate sense that price reflects all available information. What the analysis shows is that this aggregate efficiency is /logically insufficient/ to conclude that investors have formed efficient estimates of the individual components. Component learning requires supplementary signals beyond price, and the degree of component-level efficiency depends on the richness of the informational ecosystem --- disclosures, analyst coverage, and peer information channels --- not on aggregate price convergence alone.
 
@@ -486,14 +492,24 @@ where $\theta_i^m$ is the true value of parameter $i$ in market $m$ and $\bar{\h
   :CUSTOM_ID: a_sim
   :END:
 
-  This appendix provides the complete implementation of the agent-based simulation described in Section 3, written in Clojure, a functional programming language whose immutable data structures and first-class functions make it well suited to modeling stateless agent interactions. The code serves two purposes: it provides a concrete, executable specification of the model, and it enables replication and extension of the results.
+  This appendix provides the complete implementation of the agent-based simulation reported in Section [[#results][4]], written in Clojure, a functional programming language whose immutable data structures and first-class functions make it well suited to modeling stateless agent interactions. The code serves two purposes: it provides a concrete, executable specification of the simulation, and it enables replication and extension of the results.
 
-  Following the assumptions stated above, the implementation creates two types of investor. Operationally, a fully informed investor's prior is equal to the true value of the security. An uninformed investor's prior consists of independent draws from $\mathcal{N}(0,1)$. The following function creates either an informed or uninformed investor, depending on its arguments:
+  The simulation implements three design choices beyond the model assumptions stated in Section [[#model][3]]:
+
+  \emph{Market price mechanism.} The market maintains a scalar price $p_t$, initialized at $p_0 = V + \eta$ where $\eta \sim \mathcal{N}(0,1)$, and updated by $p_{t+1} = p_t + \delta \cdot \text{sgn}(\sum_j d_j^t)$ with $\delta = 0.01$.
+
+  \emph{Trading rule.} Each investor submits a unit order $d_j^t \in \{-1, 0, 1\}$ based on whether her aggregate prior exceeds the current price.
+
+  \emph{Belief updating.} Informed investors do not update. Uninformed investors update if price fails to move toward their prior: they select a parameter $k$ uniformly at random, compute the inferred value $\tilde{\theta}_k^j = p_t - \sum_{i \neq k}\hat{\theta}_i^j$, and average: $\hat{\theta}_k^{j,\text{new}} = (\hat{\theta}_k^j + \tilde{\theta}_k^j)/2$.
+
+  This updating rule is deliberately simple. As Proposition \ref{prop:bayesian} demonstrates, the identification problem persists even under Bayesian optimality; the heuristic rule is adopted to show that it also manifests under bounded rationality, not because the results depend on it.
+
+  Following these design choices, the implementation creates two types of investor. Operationally, a fully informed investor's prior is equal to the true value of the security. An uninformed investor's prior consists of independent draws from $\mathcal{N}(0,1)$. The following function creates either an informed or uninformed investor, depending on its arguments:
 
 \singlespacing
 #+BEGIN_SRC clojure :results value silent
   (defn make-investor
-    ([n] ;; Makes an uninformed agent (Assumption 3)
+    ([n] ;; Makes an uninformed agent
      {:prior (vec (repeatedly n (fn [] {:informed? false :value (draw-round)})))
       :id (uuid)})
     ([v fully?] ;; Makes an informed agent from a vector of parameters
@@ -512,14 +528,14 @@ where $\theta_i^m$ is the true value of parameter $i$ in market $m$ and $\bar{\h
 
 See [[#a_util][Appendix B]] for definitions of helper functions such as draw-round.
 
-When called with an integer, /n/, the above function creates an uninformed investor with a randomly-generated prior containing /n/ parameters (Assumption \ref{a:information}). When called with a vector prior /v/ and with /fully?/ set to true, the function creates a fully informed investor whose prior is set to the vector prior. The function also contains an option to create a partially informed investor: if /fully?/ is set to false, the function randomly chooses to make the investor informed about one parameter in the vector prior. This option is included for potential extensions; all results reported in this paper use the fully informed/fully uninformed specification described in Assumption \ref{a:investors}.
+When called with an integer, /n/, the above function creates an uninformed investor with a randomly-generated prior containing /n/ parameters (Assumption \ref{a:information}). When called with a vector prior /v/ and with /fully?/ set to true, the function creates a fully informed investor whose prior is set to the vector prior. The function also contains an option to create a partially informed investor: if /fully?/ is set to false, the function randomly chooses to make the investor informed about one parameter in the vector prior. This option is included for potential extensions; all results reported in this paper use the fully informed/fully uninformed specification.
 
-As stated in Assumption \ref{a:investors}, the number of informed investors is set to a fixed fraction $\lambda$ of the total. Consistent with the view that price constitutes an average consensus belief of traders (citet:verrecchiaConsensusBeliefsInformation1980), $\lambda > 0.5$ results in consistent convergence to true price. The implementation sets $\lambda = 0.6$ and $N = 500$, yielding 300 informed and 200 uninformed investors. The following variables and functions create a vector of investors according to this design:
+The number of informed investors is set to a fixed fraction $\lambda$ of the total. Consistent with the view that price constitutes an average consensus belief of traders (citet:verrecchiaConsensusBeliefsInformation1980), $\lambda > 0.5$ results in consistent convergence to true price. The implementation sets $\lambda = 0.6$ and $N = 500$, yielding 300 informed and 200 uninformed investors. The following variables and functions create a vector of investors according to this design:
 
 \singlespacing
 #+BEGIN_SRC clojure :results value silent
-  (def investor-num 500) ;; N = 500 (Assumption 2)
-  (def inform-frac 0.6) ;; lambda = 0.6 (Assumption 2)
+  (def investor-num 500) ;; N = 500
+  (def inform-frac 0.6) ;; lambda = 0.6
   (defn make-investor-list
     [n inf-prior]
     (into [] (concat (repeatedly (* investor-num inform-frac)
@@ -529,7 +545,7 @@ As stated in Assumption \ref{a:investors}, the number of informed investors is s
 #+END_SRC
 \doublespacing
 
-These investors trade in a simulated market. The following function creates the market, implementing Assumptions \ref{a:security} and \ref{a:price}:
+These investors trade in a simulated market. The following function creates the market:
 
 \singlespacing
 #+BEGIN_SRC clojure :results value silent
@@ -547,14 +563,14 @@ These investors trade in a simulated market. The following function creates the 
 
 The argument /n/ specifies the number of parameters $n$ that determine the value of the security, and thus the number of parameters in each investor's prior. Parameter values are drawn from $\mathcal{N}(0, 1)$ and rounded to two decimal places (establishing a minimum tick size of 0.01). The starting price is set by summing the valuation parameters and adding a draw from $\mathcal{N}(0, 1)$, so that $p_0 = V + \eta$. The function then creates the investors as specified above.
 
-The following functions update the market price based on investor demand for shares. As stated in Assumptions \ref{a:trading} and \ref{a:price}, investors submit unit orders $d_j^t \in \{-1, 0, 1\}$ based on whether their aggregate prior exceeds the current price, and the market adjusts price by $\pm \delta$ based on the sign of the net order imbalance.
+The following functions update the market price based on investor demand for shares. Investors submit unit orders $d_j^t \in \{-1, 0, 1\}$ based on whether their aggregate prior exceeds the current price, and the market adjusts price by $\pm \delta$ based on the sign of the net order imbalance.
 
 \singlespacing
 #+BEGIN_SRC clojure :results value silent
 
   (defn- order-update
     [m]
-    (let [;; Implements Assumption 5: d_j^t based on prior vs. price
+    (let [;; d_j^t based on prior vs. price
           pe (reduce + (mapv (fn [a]
                                (let [prior (reduce + (prior-vals a))]
                                  (cond
@@ -562,7 +578,7 @@ The following functions update the market price based on investor demand for sha
                                    (< (:price m) prior) 1
                                    :else 0)))
                              (:investors m)))]
-      ;; Implements Assumption 4: p_{t+1} = p_t + delta * sgn(sum of orders)
+      ;; p_{t+1} = p_t + delta * sgn(sum of orders)
       (+ (:price m) (cond
                       (> pe 0) 0.01
                       (< pe 0) -0.01
@@ -573,14 +589,14 @@ The following functions update the market price based on investor demand for sha
     [m pred upd]
     (mapv (fn [a]
             ;; the predicate determines
-            ;; if the agent updates (Assumption 6).
+            ;; if the agent updates.
             (let [pred (pred m a)]
               (cond
                 ;; if agent is informed or predicate is not satisfied,
                 ;; do not update.
                 (or (not pred) (informed-agent? a)) a
                 ;; otherwise, randomly select an uninformed parameter
-                ;; and apply the update function (Assumption 6, steps 1-3).
+                ;; and apply the update function.
                 :else (let [pri (:prior a)
                             ;; Step 1: select parameter k uniformly at random
                             i ((fn [v]
@@ -623,7 +639,7 @@ The following functions update the market price based on investor demand for sha
         (assoc :sp (conj (:sp m) (:price m)))
         ;; runs the order update function above
         (assoc :price (order-update m))
-        ;; updates investors (Assumption 6)
+        ;; updates investors
         (assoc :investors (rand-prior-update
                            m
                            ;; predicate: update if price does not move toward prior
@@ -635,7 +651,7 @@ The following functions update the market price based on investor demand for sha
 #+END_SRC
 \doublespacing
 
-As stated in Assumption \ref{a:updating}, informed investors do not update. Uninformed investors observe the period-over-period price change and decide to revise a parameter of their prior if the price fails to move towards what they deem to be the correct price. Otherwise, they assume that their prior is accurate.
+Informed investors do not update. Uninformed investors observe the period-over-period price change and decide to revise a parameter of their prior if the price fails to move towards what they deem to be the correct price. Otherwise, they assume that their prior is accurate.
 
 When their prior contains only a single parameter ($n = 1$), uninformed investors update that parameter. Otherwise, uninformed investors are unable to distinguish from price movements which parameter of their prior is incorrect --- this is a direct consequence of the identification problem stated in Proposition \ref{prop:nonid} --- and revise a random parameter from their prior vector. They compute the inferred value of the selected parameter by subtracting their estimates of all other parameters from the observed price, then average their current estimate with this inferred value. As a result, uninformed investors slowly adjust their prior to match the price signal they receive, but their parameter-level adjustments are based on an incomplete decomposition of the price signal.
 
@@ -667,7 +683,7 @@ The /converge?/ function calculates a rolling window of length 10 on the market'
 
 *** Results Generation
 
-  The following code generates the simulation results presented in Section 4.
+  The following code generates the simulation results presented in Section [[#results][4]].
 
 \singlespacing
 #+BEGIN_SRC clojure :results value silent
