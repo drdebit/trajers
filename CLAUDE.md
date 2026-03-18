@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Trajers is the codebase for the academic paper **"Sympathy for the Noise Trader: Limitations of Learning from Price"** by Matthew D. DeAngelis (Georgia State University). It implements an agent-based market simulation in Clojure to explore the limits of investor learning from price signals.
+Trajers is the codebase for the academic paper **"Sympathy for the Noise Trader: Limitations of Learning from Price"** by Matthew D. DeAngelis (Georgia State University). The paper derives formal propositions on the limits of investor learning from price signals, confirmed by an agent-based simulation in Clojure.
 
 ### Research Question
 
-The paper extends the Grossman & Stiglitz (1980) model from a single valuation parameter to multiple parameters. The core finding: markets converge on the correct **aggregate price** (sum of parameters), but investors do **not** achieve efficient estimates of **individual parameters**. Uninformed investors can only approximate a linear combination consistent with price, not the true component values. Individual parameter errors increase as the number of parameters grows.
+The paper extends the Grossman & Stiglitz (1980) model from a single valuation parameter to multiple parameters. The core finding: markets converge on the correct **aggregate price** (sum of parameters), but investors do **not** achieve efficient estimates of **individual parameters** — even under Bayesian optimality (Proposition 2 shows posterior variance is σ₀²(n-1)/n per component). Uninformed investors can only approximate a linear combination consistent with price, not the true component values. Individual parameter errors increase as the number of parameters grows.
 
 ### Implications
 
@@ -52,7 +52,8 @@ Neanderthal (linear algebra library) requires Intel MKL. The project configures 
 ## Architecture
 
 - **`trajers.core`** — Main namespace. Most simulation functions are commented out in `core.clj`; the canonical/complete versions live in `trajers.org` as literate-programming source blocks. Active code in `core.clj`: `sample-agent`, `write-object`, `-main`.
-- **`trajers.org`** — The paper itself in Emacs org-mode with embedded Clojure code blocks (exported to LaTeX/PDF). This is the authoritative source for the simulation logic. Key functions defined here:
+- **`trajers-v2.org`** — Current revision of the paper in Emacs org-mode with embedded Clojure code blocks (exported to LaTeX/PDF). The main model (Section 3) has 3 assumptions and 6 propositions; the simulation (Section 4, Appendix A) is confirmatory. Key simulation functions defined here:
+- **`trajers.org`** — Original version of the paper. Key functions defined here:
   - `make-investor` / `make-investor-list` — Creates informed (prior = true value) or uninformed (random normal prior) investors
   - `make-market` — Initializes a market with n-parameter security vector, starting price, and 500 investors (60% informed, 40% uninformed)
   - `order-update` — Sums buy/sell orders (+1/-1/0) from investors comparing priors to price
